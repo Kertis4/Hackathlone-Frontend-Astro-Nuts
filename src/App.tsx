@@ -690,10 +690,10 @@ export default function App(): React.JSX.Element {
                 emissive = 0x111111;
             }
 
-            // Create asteroid mesh - FIXED type casting
+            // Create asteroid mesh - FIXED type casting by casting to unknown first
             const asteroidMesh = createDetailedAsteroid(size, color);
             asteroidMesh.userData = asteroid;
-            const typedMesh = asteroidMesh as AsteroidMesh;
+            const typedMesh = asteroidMesh as unknown as AsteroidMesh;
             
             typedMesh.position.set(x, y, z);
             typedMesh.orbitRing = orbitRing;
