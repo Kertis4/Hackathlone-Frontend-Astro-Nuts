@@ -667,13 +667,6 @@ export default function App(): JSX.Element {
         }));
     };
 
-    const togglePanel = (panel: keyof typeof expandedPanels) => {
-        setExpandedPanels((prev) => ({
-            ...prev,
-            [panel]: !prev[panel],
-        }));
-    };
-
     // DYNAMIC RING CREATION SYSTEM - Creates as many rings as needed
     const recreateAsteroids = () => {
         if (!sceneRef.current || visibleAsteroids.length === 0) return;
