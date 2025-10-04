@@ -593,7 +593,12 @@ export default function App(): JSX.Element {
     const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
     const animationIdRef = useRef<number | null>(null);
     const isInitialized = useRef<boolean>(false);
+    const selectedAsteroidRef = useRef<AsteroidData | null>(null);
     
+
+    useEffect(() => {
+    selectedAsteroidRef.current = selectedAsteroid;
+}, [selectedAsteroid]);
     // Fixed animation speed - no slider needed since we have pause/resume
     const animationSpeed = 1.0;
 
@@ -801,13 +806,33 @@ export default function App(): JSX.Element {
         // Create initial asteroids
         recreateAsteroids();
 
-        // Mouse interaction
+        // Mouse interaction - FIXED drag vs click detection
         const raycaster = new THREE.Raycaster();
         const mouse = new THREE.Vector2();
         let previousHovered: AsteroidMesh | null = null;
+        let mouseDownTime = 0;
+        let mouseDownPosition = { x: 0, y: 0 };
+        let isDragging = false;
+
+        const onMouseDown = (event: MouseEvent): void => {
+            mouseDownTime = Date.now();
+            mouseDownPosition = { x: event.clientX, y: event.clientY };
+            isDragging = false;
+        };
 
         const onMouseMove = (event: MouseEvent): void => {
             if (!mountRef.current) return;
+
+            // Check if we're dragging (mouse moved significantly since mousedown)
+            if (mouseDownTime > 0) {
+                const dragDistance = Math.sqrt(
+                    Math.pow(event.clientX - mouseDownPosition.x, 2) + 
+                    Math.pow(event.clientY - mouseDownPosition.y, 2)
+                );
+                if (dragDistance > 5) { // 5px threshold
+                    isDragging = true;
+                }
+            }
 
             const rect = mountRef.current.getBoundingClientRect();
             mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
@@ -841,45 +866,48 @@ export default function App(): JSX.Element {
             }
         };
 
-        const onMouseClick = (event: MouseEvent): void => {
+        const onMouseUp = (event: MouseEvent): void => {
             if (!mountRef.current) return;
 
-            const rect = mountRef.current.getBoundingClientRect();
-            mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-            mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+            const clickDuration = Date.now() - mouseDownTime;
+            
+            // Only process clicks (not drags)
+            if (!isDragging && clickDuration < 300) { // Quick click, not drag
+                const rect = mountRef.current.getBoundingClientRect();
+                mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+                mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
 
-            raycaster.setFromCamera(mouse, camera);
-            const intersects = raycaster.intersectObjects(Object.values(asteroidMeshes.current));
+                raycaster.setFromCamera(mouse, camera);
+                const intersects = raycaster.intersectObjects(Object.values(asteroidMeshes.current));
 
-            if (intersects.length > 0) {
-                // ASTEROID CLICKED - SELECT AND PAUSE ANIMATIONS
-                const clickedMesh = intersects[0].object as AsteroidMesh;
-                setSelectedAsteroid(clickedMesh.userData);
-                
-                // Remove previous trajectory
-                if (currentImpactTrajectory.current) {
-                    scene.remove(currentImpactTrajectory.current);
-                    currentImpactTrajectory.current = null;
-                }
-                
-                // Add impact trajectory from asteroid current position to impact zones
-                const trajectory = createImpactTrajectory(clickedMesh.position, clickedMesh.userData.impact.risk_zones);
-                scene.add(trajectory);
-                currentImpactTrajectory.current = trajectory;
-                
-                // Click feedback
-                const originalScale = clickedMesh.scale.x;
-                clickedMesh.scale.setScalar(originalScale * 0.9);
-                setTimeout(() => {
-                    if (clickedMesh.scale) {
-                        clickedMesh.scale.setScalar(originalScale);
+                if (intersects.length > 0) {
+                    // ASTEROID CLICKED - SELECT AND PAUSE ANIMATIONS
+                    const clickedMesh = intersects[0].object as AsteroidMesh;
+                    setSelectedAsteroid(clickedMesh.userData);
+                    
+                    // Remove previous trajectory
+                    if (currentImpactTrajectory.current) {
+                        scene.remove(currentImpactTrajectory.current);
+                        currentImpactTrajectory.current = null;
                     }
-                }, 100);
-                
-                console.log('🎯 Asteroid selected - animations paused:', clickedMesh.userData.name);
-            } else {
-                // CLICKED EMPTY SPACE - DESELECT ASTEROID AND RETURN TO MAIN MENU
-                if (selectedAsteroid) {
+                    
+                    // Add impact trajectory from asteroid current position to impact zones
+                    const trajectory = createImpactTrajectory(clickedMesh.position, clickedMesh.userData.impact.risk_zones);
+                    scene.add(trajectory);
+                    currentImpactTrajectory.current = trajectory;
+                    
+                    // Click feedback
+                    const originalScale = clickedMesh.scale.x;
+                    clickedMesh.scale.setScalar(originalScale * 0.9);
+                    setTimeout(() => {
+                        if (clickedMesh.scale) {
+                            clickedMesh.scale.setScalar(originalScale);
+                        }
+                    }, 100);
+                    
+                    console.log('🎯 Asteroid selected - animations paused:', clickedMesh.userData.name);
+                } else {
+                    // CLICKED EMPTY SPACE - DESELECT ASTEROID AND RETURN TO MAIN MENU
                     setSelectedAsteroid(null);
                     
                     // Remove trajectory
@@ -891,100 +919,113 @@ export default function App(): JSX.Element {
                     console.log('🔄 Asteroid deselected - back to main menu, animations resumed');
                 }
             }
+
+            // Reset tracking variables
+            mouseDownTime = 0;
+            isDragging = false;
         };
 
-        // Event listeners
+        // Event listeners - UPDATED for drag detection
+        mountRef.current.addEventListener('mousedown', onMouseDown);
         mountRef.current.addEventListener('mousemove', onMouseMove);
-        mountRef.current.addEventListener('click', onMouseClick);
+        mountRef.current.addEventListener('mouseup', onMouseUp);
 
-        // Animation loop - ZOOM WORKING PERFECTLY, DON'T TOUCH DISTANCE UPDATES
-        let frameCount = 0;
-        const animate = (): void => {
-            if (animationIdRef.current) {
-                cancelAnimationFrame(animationIdRef.current);
+        // Animation loop - FIXED with proper ref sync via useEffect
+let frameCount = 0;
+const animate = (): void => {
+    if (animationIdRef.current) {
+        cancelAnimationFrame(animationIdRef.current);
+    }
+    animationIdRef.current = requestAnimationFrame(animate);
+    frameCount++;
+
+    // Update OrbitControls
+    controls.update();
+
+    // Update distance display very occasionally - ZOOM WORKING PERFECTLY
+    if (frameCount % 300 === 0) {
+        const currentDistance = camera.position.distanceTo(controls.target);
+        const roundedDistance = Math.round(currentDistance * 10) / 10;
+        if (Math.abs(roundedDistance - cameraDistance) > 1) {
+            setCameraDistance(roundedDistance);
+        }
+    }
+
+    // PAUSE ANIMATIONS WHEN ASTEROID IS SELECTED - FIXED with ref synced by useEffect
+    const isAnimationsPaused = selectedAsteroidRef.current !== null;
+
+    // Earth rotation - paused when asteroid selected
+    if (!isAnimationsPaused && earthRef.current) {
+        earthRef.current.rotation.y += 0.008 * animationSpeed;
+    }
+
+    // Star twinkling (always active)
+    const time = Date.now() * 0.001;
+
+    // Asteroid orbital motion and rotation - paused when asteroid selected
+    if (!isAnimationsPaused) {
+        Object.values(asteroidMeshes.current).forEach((mesh, index) => {
+            const asteroid = mesh.userData;
+            
+            // Asteroid rotation
+            const rotSpeed = asteroid.relative_velocity_km_s * 0.0001 * animationSpeed;
+            mesh.rotation.x += rotSpeed * 0.5;
+            mesh.rotation.y += rotSpeed;
+
+            // Orbital motion around Earth
+            if (mesh.orbitRadius && mesh.orbitSpeed !== undefined && mesh.orbitAngle !== undefined && mesh.orbitCenter) {
+                mesh.orbitAngle += mesh.orbitSpeed * animationSpeed;
+                
+                // Update position based on orbital motion
+                mesh.position.x = Math.cos(mesh.orbitAngle) * mesh.orbitRadius;
+                mesh.position.z = Math.sin(mesh.orbitAngle) * mesh.orbitRadius;
+                mesh.position.y = mesh.orbitCenter.y;
             }
-            animationIdRef.current = requestAnimationFrame(animate);
-            frameCount++;
+        });
+    }
 
-            // Update OrbitControls
-            controls.update();
+    // ALWAYS UPDATE GLOW EFFECTS and handle SELECTED ASTEROID PULSE
+    Object.values(asteroidMeshes.current).forEach((mesh, index) => {
+        const asteroid = mesh.userData;
+        const material = mesh.material as THREE.MeshPhongMaterial;
 
-            // Update distance display very occasionally - ZOOM WORKING PERFECTLY
-            if (frameCount % 300 === 0) {
-                const currentDistance = camera.position.distanceTo(controls.target);
-                const roundedDistance = Math.round(currentDistance * 10) / 10;
-                if (Math.abs(roundedDistance - cameraDistance) > 1) {
-                    setCameraDistance(roundedDistance);
-                }
+        // Check if this is the selected asteroid
+        const isSelected = selectedAsteroidRef.current && asteroid.id === selectedAsteroidRef.current.id;
+
+        if (isSelected) {
+            // VERY SLIGHT pulse for selected asteroid
+            const pulseIntensity = 1.0 + Math.sin(time * 3) * 0.05; // Very subtle 5% scale variation
+            mesh.scale.setScalar(pulseIntensity);
+            
+            // Brighter emissive for selected
+            material.emissiveIntensity = 1.5 + Math.sin(time * 2) * 0.3;
+        } else if ((asteroid.is_sentry_object || asteroid.is_potentially_hazardous_asteroid) && mesh !== previousHovered) {
+            // Natural glow for hazardous asteroids (not selected)
+            const glowIntensity = 0.5 + Math.sin(time * 1.5 + index) * 0.3;
+            material.emissiveIntensity = glowIntensity;
+            
+            // Reset scale for non-selected asteroids
+            if (mesh.scale.x !== 1) {
+                mesh.scale.setScalar(1);
             }
-
-            // PAUSE EARTH ROTATION AND ASTEROID ORBITS WHEN ASTEROID IS SELECTED
-            const isAnimationsPaused = selectedAsteroid !== null;
-
-            // Earth rotation - paused when asteroid selected
-            if (!isAnimationsPaused && earthRef.current) {
-                earthRef.current.rotation.y += 0.008 * animationSpeed;
+        } else {
+            // Reset scale and emissive for regular asteroids
+            if (mesh.scale.x !== 1) {
+                mesh.scale.setScalar(1);
             }
-
-            // Star twinkling (always active)
-            const time = Date.now() * 0.001;
-
-            // Asteroid orbital motion and rotation - paused when asteroid selected
-            if (!isAnimationsPaused) {
-                Object.values(asteroidMeshes.current).forEach((mesh, index) => {
-                    const asteroid = mesh.userData;
-                    
-                    // Asteroid rotation
-                    const rotSpeed = asteroid.relative_velocity_km_s * 0.0001 * animationSpeed;
-                    mesh.rotation.x += rotSpeed * 0.5;
-                    mesh.rotation.y += rotSpeed;
-
-                    // Orbital motion around Earth
-                    if (mesh.orbitRadius && mesh.orbitSpeed !== undefined && mesh.orbitAngle !== undefined && mesh.orbitCenter) {
-                        mesh.orbitAngle += mesh.orbitSpeed * animationSpeed;
-                        
-                        // Update position based on orbital motion
-                        mesh.position.x = Math.cos(mesh.orbitAngle) * mesh.orbitRadius;
-                        mesh.position.z = Math.sin(mesh.orbitAngle) * mesh.orbitRadius;
-                        mesh.position.y = mesh.orbitCenter.y;
-                    }
-
-                    // Natural glow for hazardous asteroids (always active)
-                    if ((asteroid.is_sentry_object || asteroid.is_potentially_hazardous_asteroid) && mesh !== previousHovered) {
-                        const material = mesh.material as THREE.MeshPhongMaterial;
-                        const glowIntensity = 0.5 + Math.sin(time * 1.5 + index) * 0.3;
-                        material.emissiveIntensity = glowIntensity;
-                    }
-                });
-            } else {
-                // Still update glow effects even when paused
-                Object.values(asteroidMeshes.current).forEach((mesh, index) => {
-                    const asteroid = mesh.userData;
-                    if ((asteroid.is_sentry_object || asteroid.is_potentially_hazardous_asteroid) && mesh !== previousHovered) {
-                        const material = mesh.material as THREE.MeshPhongMaterial;
-                        const glowIntensity = 0.5 + Math.sin(time * 1.5 + index) * 0.3;
-                        material.emissiveIntensity = glowIntensity;
-                    }
-                });
+            if (material.emissiveIntensity !== mesh.originalEmissiveIntensity) {
+                material.emissiveIntensity = mesh.originalEmissiveIntensity!;
             }
+        }
+    });
 
-            // Animate impact trajectory if visible (always animate for visual appeal)
-            if (currentImpactTrajectory.current) {
-                currentImpactTrajectory.current.children.forEach((child, index) => {
-                    if (child.type === 'Mesh' && index % 3 === 2) { // Pulse rings
-                        const scale = 1 + Math.sin(time * 3 + index) * 0.3;
-                        child.scale.setScalar(scale);
-                        const material = (child as THREE.Mesh).material as THREE.MeshBasicMaterial;
-                        material.opacity = 0.4 + Math.sin(time * 2 + index) * 0.2;
-                    }
-                });
-            }
+    // Rest of animation code stays the same...
+    renderer.render(scene, camera);
+};
 
-            renderer.render(scene, camera);
-        };
         animate();
 
-        // Cleanup
+        // Cleanup - UPDATED for all mouse events
         return () => {
             if (animationIdRef.current) {
                 cancelAnimationFrame(animationIdRef.current);
@@ -997,8 +1038,9 @@ export default function App(): JSX.Element {
                 mountRef.current.removeChild(renderer.domElement);
             }
 
+            mountRef.current?.removeEventListener('mousedown', onMouseDown);
             mountRef.current?.removeEventListener('mousemove', onMouseMove);
-            mountRef.current?.removeEventListener('click', onMouseClick);
+            mountRef.current?.removeEventListener('mouseup', onMouseUp);
 
             if (currentImpactTrajectory.current) {
                 scene.remove(currentImpactTrajectory.current);
@@ -1136,8 +1178,8 @@ export default function App(): JSX.Element {
 
                 {/* Instructions */}
                 <div className="absolute bottom-4 left-4 bg-gray-800 bg-opacity-90 backdrop-blur-sm rounded-lg p-3">
-                    <p className="text-sm text-gray-300">🖱️ Click asteroids to analyze • Click empty space to return to main menu</p>
-                    <p className="text-xs text-gray-400">⚡ Drag to rotate • Hover for glow • Selection pauses all motion</p>
+                    <p className="text-sm text-gray-300">🖱️ Click (not drag) asteroids to analyze • Click empty space to return to main menu</p>
+                    <p className="text-xs text-gray-400">⚡ Dragging won't deselect • Hover for glow • Selection pauses all motion & adds pulse</p>
                 </div>
             </div>
 
@@ -1215,6 +1257,12 @@ export default function App(): JSX.Element {
                                     </p>
                                 </div>
                                 <div>
+                                    <span className="text-gray-400">Selected Asteroid:</span>
+                                    <p className="font-mono text-yellow-400">
+                                        Subtle pulse + brighter glow
+                                    </p>
+                                </div>
+                                <div>
                                     <span className="text-gray-400">Potential Energy:</span>
                                     <p className="font-mono text-red-400">
                                         {formatNumber(selectedAsteroid.impact.energy_megatons)} Megatons TNT
@@ -1284,7 +1332,7 @@ export default function App(): JSX.Element {
                             <div className="space-y-2 text-sm">
                                 <div className="flex justify-between">
                                     <span>Select Asteroid:</span>
-                                    <span className="font-mono text-green-400">Click</span>
+                                    <span className="font-mono text-green-400">Click (not drag)</span>
                                 </div>
                                 <div className="flex justify-between">
                                     <span>Return to Menu:</span>
@@ -1295,8 +1343,8 @@ export default function App(): JSX.Element {
                                     <span className="font-mono text-red-400">Auto on Select</span>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span>Asteroid Count:</span>
-                                    <span className="font-mono text-yellow-400">Use Slider Above</span>
+                                    <span>Selected Visual:</span>
+                                    <span className="font-mono text-yellow-400">Subtle Pulse</span>
                                 </div>
                             </div>
                         </div>
