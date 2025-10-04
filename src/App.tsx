@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 // ========== API CONFIGURATION ==========
-const API_BASE_URL = 'http://localhost:5000'; // Change this to your API URL
+const API_BASE_URL = 'http://127.0.0.1:8000'; // Change this to your API URL
 // =======================================
 
 interface AsteroidData {
