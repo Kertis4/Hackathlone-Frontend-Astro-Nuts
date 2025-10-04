@@ -2,6 +2,10 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
+// ========== API CONFIGURATION ==========
+const API_BASE_URL = 'http://localhost:5000'; // Change this to your API URL
+// =======================================
+
 interface AsteroidData {
     id: string;
     name: string;
@@ -50,1131 +54,95 @@ interface AsteroidMesh extends THREE.Mesh {
     orbitCenter?: THREE.Vector3;
 }
 
-const ASTEROID_DATA: AsteroidData[] = [
-    {
-        id: '2465633',
-        name: '465633 (2009 JR5)',
-        nasa_jpl_url: 'https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=2465633',
-        absolute_magnitude_h: 20.44,
-        estimated_diameter_km_min: 0.2170475943,
-        estimated_diameter_km_max: 0.4853331752,
-        estimated_diameter_m_min: 217.0475943071,
-        estimated_diameter_m_max: 485.3331752235,
-        estimated_diameter_mi_min: 0.1348670807,
-        estimated_diameter_mi_max: 0.3015719604,
-        estimated_diameter_ft_min: 712.0984293066,
-        estimated_diameter_ft_max: 1592.3004946003,
-        is_potentially_hazardous_asteroid: true,
-        is_sentry_object: false,
-        close_approach_date: '2015-09-08',
-        close_approach_date_full: '2015-Sep-08 20:28',
-        epoch_date_close_approach: 1441744080000,
-        relative_velocity_km_s: 18.1279360862,
-        relative_velocity_km_h: 65260.5699103704,
-        relative_velocity_mph: 40550.3802312521,
-        miss_distance_au: 0.3027469457,
-        miss_distance_lunar: 117.7685618773,
-        miss_distance_km: 45290298.22572566,
-        miss_distance_mi: 28142086.351581734,
-        orbiting_body: 'Earth',
-        impact: {
-            energy_megatons: 150,
-            crater_km: 3.2,
-            risk_zones: ['Pacific Ocean', 'Coastal Japan'],
-        },
-        torino_scale: 1,
-        importance_score: 5,
-    },
-    {
-        id: '2394051',
-        name: '394051 (2006 AM4)',
-        nasa_jpl_url: 'https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=2394051',
-        absolute_magnitude_h: 18.9,
-        estimated_diameter_km_min: 0.4,
-        estimated_diameter_km_max: 0.9,
-        estimated_diameter_m_min: 400,
-        estimated_diameter_m_max: 900,
-        estimated_diameter_mi_min: 0.248548,
-        estimated_diameter_mi_max: 0.559234,
-        estimated_diameter_ft_min: 1312.336,
-        estimated_diameter_ft_max: 2952.756,
-        is_potentially_hazardous_asteroid: true,
-        is_sentry_object: true,
-        close_approach_date: '2029-04-13',
-        close_approach_date_full: '2029-Apr-13 21:46',
-        epoch_date_close_approach: 1871234080000,
-        relative_velocity_km_s: 7.42,
-        relative_velocity_km_h: 26712,
-        relative_velocity_mph: 16590.2,
-        miss_distance_au: 0.0255,
-        miss_distance_lunar: 9.93,
-        miss_distance_km: 3816906,
-        miss_distance_mi: 2371234,
-        orbiting_body: 'Earth',
-        impact: {
-            energy_megatons: 875,
-            crater_km: 8.5,
-            risk_zones: ['Atlantic Ocean', 'European Coast', 'African Coast'],
-        },
-        torino_scale: 3,
-        importance_score: 10,
-    },
-    {
-        id: '2099942',
-        name: '99942 Apophis',
-        nasa_jpl_url: 'https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=2099942',
-        absolute_magnitude_h: 19.7,
-        estimated_diameter_km_min: 0.31,
-        estimated_diameter_km_max: 0.34,
-        estimated_diameter_m_min: 310,
-        estimated_diameter_m_max: 340,
-        estimated_diameter_mi_min: 0.192625,
-        estimated_diameter_mi_max: 0.211266,
-        estimated_diameter_ft_min: 1017.06,
-        estimated_diameter_ft_max: 1115.49,
-        is_potentially_hazardous_asteroid: true,
-        is_sentry_object: false,
-        close_approach_date: '2029-04-13',
-        close_approach_date_full: '2029-Apr-13 21:46',
-        epoch_date_close_approach: 1871234080000,
-        relative_velocity_km_s: 7.42,
-        relative_velocity_km_h: 26712,
-        relative_velocity_mph: 16590.2,
-        miss_distance_au: 0.0255,
-        miss_distance_lunar: 9.93,
-        miss_distance_km: 3816906,
-        miss_distance_mi: 2371234,
-        orbiting_body: 'Earth',
-        impact: {
-            energy_megatons: 506,
-            crater_km: 5.1,
-            risk_zones: ['Indian Ocean', 'Southeast Asia'],
-        },
-        torino_scale: 2,
-        importance_score: 8,
-    },
-    {
-        id: '2000433',
-        name: '433 Eros',
-        nasa_jpl_url: 'https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=2000433',
-        absolute_magnitude_h: 10.4,
-        estimated_diameter_km_min: 16.84,
-        estimated_diameter_km_max: 16.84,
-        estimated_diameter_m_min: 16840,
-        estimated_diameter_m_max: 16840,
-        estimated_diameter_mi_min: 10.46,
-        estimated_diameter_mi_max: 10.46,
-        estimated_diameter_ft_min: 55250,
-        estimated_diameter_ft_max: 55250,
-        is_potentially_hazardous_asteroid: false,
-        is_sentry_object: false,
-        close_approach_date: '2031-01-31',
-        close_approach_date_full: '2031-Jan-31 02:17',
-        epoch_date_close_approach: 1927758720000,
-        relative_velocity_km_s: 23.04,
-        relative_velocity_km_h: 82944,
-        relative_velocity_mph: 51544.3,
-        miss_distance_au: 0.178,
-        miss_distance_lunar: 69.3,
-        miss_distance_km: 26640000,
-        miss_distance_mi: 16553600,
-        orbiting_body: 'Earth',
-        impact: {
-            energy_megatons: 15000,
-            crater_km: 30,
-            risk_zones: ['Continental Devastation'],
-        },
-        torino_scale: 0,
-        importance_score: 4,
-    },
-    {
-        id: '2001036',
-        name: '1036 Ganymed',
-        nasa_jpl_url: 'https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=2001036',
-        absolute_magnitude_h: 9.45,
-        estimated_diameter_km_min: 31.7,
-        estimated_diameter_km_max: 38.9,
-        estimated_diameter_m_min: 31700,
-        estimated_diameter_m_max: 38900,
-        estimated_diameter_mi_min: 19.7,
-        estimated_diameter_mi_max: 24.2,
-        estimated_diameter_ft_min: 104000,
-        estimated_diameter_ft_max: 127600,
-        is_potentially_hazardous_asteroid: false,
-        is_sentry_object: false,
-        close_approach_date: '2024-10-13',
-        close_approach_date_full: '2024-Oct-13 14:56',
-        epoch_date_close_approach: 1728825360000,
-        relative_velocity_km_s: 19.56,
-        relative_velocity_km_h: 70416,
-        relative_velocity_mph: 43750.8,
-        miss_distance_au: 0.381,
-        miss_distance_lunar: 148.2,
-        miss_distance_km: 57000000,
-        miss_distance_mi: 35418600,
-        orbiting_body: 'Earth',
-        impact: {
-            energy_megatons: 50000,
-            crater_km: 45,
-            risk_zones: ['Global Impact', 'Mass Extinction Event'],
-        },
-        torino_scale: 0,
-        importance_score: 7,
-    },
-    {
-        id: '2004769',
-        name: '4769 Castalia',
-        nasa_jpl_url: 'https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=2004769',
-        absolute_magnitude_h: 16.9,
-        estimated_diameter_km_min: 1.4,
-        estimated_diameter_km_max: 1.8,
-        estimated_diameter_m_min: 1400,
-        estimated_diameter_m_max: 1800,
-        estimated_diameter_mi_min: 0.87,
-        estimated_diameter_mi_max: 1.12,
-        estimated_diameter_ft_min: 4593,
-        estimated_diameter_ft_max: 5906,
-        is_potentially_hazardous_asteroid: false,
-        is_sentry_object: false,
-        close_approach_date: '2028-08-19',
-        close_approach_date_full: '2028-Aug-19 12:03',
-        epoch_date_close_approach: 1850825380000,
-        relative_velocity_km_s: 8.89,
-        relative_velocity_km_h: 32004,
-        relative_velocity_mph: 19884.8,
-        miss_distance_au: 0.545,
-        miss_distance_lunar: 212.0,
-        miss_distance_km: 81500000,
-        miss_distance_mi: 50642500,
-        orbiting_body: 'Earth',
-        impact: {
-            energy_megatons: 800,
-            crater_km: 12,
-            risk_zones: ['Regional Damage'],
-        },
-        torino_scale: 0,
-        importance_score: 2,
-    },
-    // NEW 25 ASTEROIDS FOR SCALING DEMONSTRATION
-    {
-        id: '2101955',
-        name: '101955 Bennu',
-        nasa_jpl_url: 'https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=2101955',
-        absolute_magnitude_h: 20.9,
-        estimated_diameter_km_min: 0.49,
-        estimated_diameter_km_max: 0.56,
-        estimated_diameter_m_min: 490,
-        estimated_diameter_m_max: 560,
-        estimated_diameter_mi_min: 0.304,
-        estimated_diameter_mi_max: 0.348,
-        estimated_diameter_ft_min: 1608,
-        estimated_diameter_ft_max: 1837,
-        is_potentially_hazardous_asteroid: true,
-        is_sentry_object: true,
-        close_approach_date: '2135-09-25',
-        close_approach_date_full: '2135-Sep-25 16:24',
-        epoch_date_close_approach: 5234567890000,
-        relative_velocity_km_s: 11.2,
-        relative_velocity_km_h: 40320,
-        relative_velocity_mph: 25055.4,
-        miss_distance_au: 0.0031,
-        miss_distance_lunar: 1.21,
-        miss_distance_km: 463000,
-        miss_distance_mi: 287658,
-        orbiting_body: 'Earth',
-        impact: {
-            energy_megatons: 1200,
-            crater_km: 15,
-            risk_zones: ['North America', 'Canada'],
-        },
-        torino_scale: 4,
-        importance_score: 9,
-    },
-    {
-        id: '2004015',
-        name: '4015 Wilson-Harrington',
-        nasa_jpl_url: 'https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=2004015',
-        absolute_magnitude_h: 16.1,
-        estimated_diameter_km_min: 2.8,
-        estimated_diameter_km_max: 3.2,
-        estimated_diameter_m_min: 2800,
-        estimated_diameter_m_max: 3200,
-        estimated_diameter_mi_min: 1.74,
-        estimated_diameter_mi_max: 1.99,
-        estimated_diameter_ft_min: 9186,
-        estimated_diameter_ft_max: 10499,
-        is_potentially_hazardous_asteroid: true,
-        is_sentry_object: false,
-        close_approach_date: '2027-11-14',
-        close_approach_date_full: '2027-Nov-14 08:15',
-        epoch_date_close_approach: 1826123700000,
-        relative_velocity_km_s: 15.8,
-        relative_velocity_km_h: 56880,
-        relative_velocity_mph: 35340.6,
-        miss_distance_au: 0.045,
-        miss_distance_lunar: 17.5,
-        miss_distance_km: 6735000,
-        miss_distance_mi: 4184775,
-        orbiting_body: 'Earth',
-        impact: {
-            energy_megatons: 2500,
-            crater_km: 20,
-            risk_zones: ['Mediterranean Sea', 'Southern Europe'],
-        },
-        torino_scale: 1,
-        importance_score: 6,
-    },
-    {
-        id: '2162173',
-        name: '162173 Ryugu',
-        nasa_jpl_url: 'https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=2162173',
-        absolute_magnitude_h: 19.2,
-        estimated_diameter_km_min: 0.87,
-        estimated_diameter_km_max: 1.02,
-        estimated_diameter_m_min: 870,
-        estimated_diameter_m_max: 1020,
-        estimated_diameter_mi_min: 0.541,
-        estimated_diameter_mi_max: 0.634,
-        estimated_diameter_ft_min: 2854,
-        estimated_diameter_ft_max: 3346,
-        is_potentially_hazardous_asteroid: true,
-        is_sentry_object: false,
-        close_approach_date: '2026-12-05',
-        close_approach_date_full: '2026-Dec-05 11:42',
-        epoch_date_close_approach: 1796678520000,
-        relative_velocity_km_s: 13.4,
-        relative_velocity_km_h: 48240,
-        relative_velocity_mph: 29968.4,
-        miss_distance_au: 0.038,
-        miss_distance_lunar: 14.8,
-        miss_distance_km: 5684000,
-        miss_distance_mi: 3531996,
-        orbiting_body: 'Earth',
-        impact: {
-            energy_megatons: 1800,
-            crater_km: 18,
-            risk_zones: ['South China Sea', 'Philippines'],
-        },
-        torino_scale: 1,
-        importance_score: 6,
-    },
-    {
-        id: '2001620',
-        name: '1620 Geographos',
-        nasa_jpl_url: 'https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=2001620',
-        absolute_magnitude_h: 15.6,
-        estimated_diameter_km_min: 4.8,
-        estimated_diameter_km_max: 5.1,
-        estimated_diameter_m_min: 4800,
-        estimated_diameter_m_max: 5100,
-        estimated_diameter_mi_min: 2.98,
-        estimated_diameter_mi_max: 3.17,
-        estimated_diameter_ft_min: 15748,
-        estimated_diameter_ft_max: 16732,
-        is_potentially_hazardous_asteroid: true,
-        is_sentry_object: false,
-        close_approach_date: '2030-08-23',
-        close_approach_date_full: '2030-Aug-23 14:35',
-        epoch_date_close_approach: 1914159300000,
-        relative_velocity_km_s: 20.1,
-        relative_velocity_km_h: 72360,
-        relative_velocity_mph: 44958.1,
-        miss_distance_au: 0.052,
-        miss_distance_lunar: 20.2,
-        miss_distance_km: 7784000,
-        miss_distance_mi: 4836016,
-        orbiting_body: 'Earth',
-        impact: {
-            energy_megatons: 8500,
-            crater_km: 35,
-            risk_zones: ['Arabian Sea', 'Western India'],
-        },
-        torino_scale: 0,
-        importance_score: 5,
-    },
-    {
-        id: '2002063',
-        name: '2063 Bacchus',
-        nasa_jpl_url: 'https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=2002063',
-        absolute_magnitude_h: 19.1,
-        estimated_diameter_km_min: 1.1,
-        estimated_diameter_km_max: 1.3,
-        estimated_diameter_m_min: 1100,
-        estimated_diameter_m_max: 1300,
-        estimated_diameter_mi_min: 0.68,
-        estimated_diameter_mi_max: 0.81,
-        estimated_diameter_ft_min: 3609,
-        estimated_diameter_ft_max: 4265,
-        is_potentially_hazardous_asteroid: false,
-        is_sentry_object: false,
-        close_approach_date: '2032-04-17',
-        close_approach_date_full: '2032-Apr-17 09:22',
-        epoch_date_close_approach: 1965567720000,
-        relative_velocity_km_s: 16.7,
-        relative_velocity_km_h: 60120,
-        relative_velocity_mph: 37344.7,
-        miss_distance_au: 0.089,
-        miss_distance_lunar: 34.6,
-        miss_distance_km: 13317000,
-        miss_distance_mi: 8273561,
-        orbiting_body: 'Earth',
-        impact: {
-            energy_megatons: 950,
-            crater_km: 12,
-            risk_zones: ['Bay of Bengal'],
-        },
-        torino_scale: 0,
-        importance_score: 3,
-    },
-    {
-        id: '2001566',
-        name: '1566 Icarus',
-        nasa_jpl_url: 'https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=2001566',
-        absolute_magnitude_h: 16.9,
-        estimated_diameter_km_min: 1.4,
-        estimated_diameter_km_max: 1.4,
-        estimated_diameter_m_min: 1400,
-        estimated_diameter_m_max: 1400,
-        estimated_diameter_mi_min: 0.87,
-        estimated_diameter_mi_max: 0.87,
-        estimated_diameter_ft_min: 4593,
-        estimated_diameter_ft_max: 4593,
-        is_potentially_hazardous_asteroid: false,
-        is_sentry_object: false,
-        close_approach_date: '2029-06-16',
-        close_approach_date_full: '2029-Jun-16 03:18',
-        epoch_date_close_approach: 1876716980000,
-        relative_velocity_km_s: 31.2,
-        relative_velocity_km_h: 112320,
-        relative_velocity_mph: 69784.4,
-        miss_distance_au: 0.042,
-        miss_distance_lunar: 16.3,
-        miss_distance_km: 6286000,
-        miss_distance_mi: 3905906,
-        orbiting_body: 'Earth',
-        impact: {
-            energy_megatons: 420,
-            crater_km: 8,
-            risk_zones: ['Caribbean Sea'],
-        },
-        torino_scale: 0,
-        importance_score: 2,
-    },
-    {
-        id: '2025143',
-        name: '25143 Itokawa',
-        nasa_jpl_url: 'https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=2025143',
-        absolute_magnitude_h: 19.2,
-        estimated_diameter_km_min: 0.33,
-        estimated_diameter_km_max: 0.33,
-        estimated_diameter_m_min: 330,
-        estimated_diameter_m_max: 330,
-        estimated_diameter_mi_min: 0.205,
-        estimated_diameter_mi_max: 0.205,
-        estimated_diameter_ft_min: 1083,
-        estimated_diameter_ft_max: 1083,
-        is_potentially_hazardous_asteroid: false,
-        is_sentry_object: false,
-        close_approach_date: '2028-02-11',
-        close_approach_date_full: '2028-Feb-11 19:45',
-        epoch_date_close_approach: 1833836700000,
-        relative_velocity_km_s: 12.8,
-        relative_velocity_km_h: 46080,
-        relative_velocity_mph: 28627.2,
-        miss_distance_au: 0.067,
-        miss_distance_lunar: 26.1,
-        miss_distance_km: 10024000,
-        miss_distance_mi: 6227904,
-        orbiting_body: 'Earth',
-        impact: {
-            energy_megatons: 65,
-            crater_km: 2.8,
-            risk_zones: ['North Atlantic'],
-        },
-        torino_scale: 0,
-        importance_score: 1,
-    },
-    {
-        id: '2003122',
-        name: '3122 Florence',
-        nasa_jpl_url: 'https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=2003122',
-        absolute_magnitude_h: 14.1,
-        estimated_diameter_km_min: 4.35,
-        estimated_diameter_km_max: 4.35,
-        estimated_diameter_m_min: 4350,
-        estimated_diameter_m_max: 4350,
-        estimated_diameter_mi_min: 2.7,
-        estimated_diameter_mi_max: 2.7,
-        estimated_diameter_ft_min: 14272,
-        estimated_diameter_ft_max: 14272,
-        is_potentially_hazardous_asteroid: true,
-        is_sentry_object: false,
-        close_approach_date: '2057-09-02',
-        close_approach_date_full: '2057-Sep-02 05:06',
-        epoch_date_close_approach: 2765478360000,
-        relative_velocity_km_s: 14.0,
-        relative_velocity_km_h: 50400,
-        relative_velocity_mph: 31317.6,
-        miss_distance_au: 0.047,
-        miss_distance_lunar: 18.3,
-        miss_distance_km: 7033000,
-        miss_distance_mi: 4370531,
-        orbiting_body: 'Earth',
-        impact: {
-            energy_megatons: 6800,
-            crater_km: 32,
-            risk_zones: ['Central Pacific', 'Hawaiian Islands'],
-        },
-        torino_scale: 0,
-        importance_score: 4,
-    },
-    {
-        id: '2054509',
-        name: '54509 YORP',
-        nasa_jpl_url: 'https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=2054509',
-        absolute_magnitude_h: 22.9,
-        estimated_diameter_km_min: 0.126,
-        estimated_diameter_km_max: 0.126,
-        estimated_diameter_m_min: 126,
-        estimated_diameter_m_max: 126,
-        estimated_diameter_mi_min: 0.078,
-        estimated_diameter_mi_max: 0.078,
-        estimated_diameter_ft_min: 413,
-        estimated_diameter_ft_max: 413,
-        is_potentially_hazardous_asteroid: false,
-        is_sentry_object: false,
-        close_approach_date: '2033-03-22',
-        close_approach_date_full: '2033-Mar-22 16:33',
-        epoch_date_close_approach: 1994540780000,
-        relative_velocity_km_s: 9.4,
-        relative_velocity_km_h: 33840,
-        relative_velocity_mph: 21025.4,
-        miss_distance_au: 0.078,
-        miss_distance_lunar: 30.3,
-        miss_distance_km: 11669000,
-        miss_distance_mi: 7249869,
-        orbiting_body: 'Earth',
-        impact: {
-            energy_megatons: 8,
-            crater_km: 1.2,
-            risk_zones: ['Remote Ocean'],
-        },
-        torino_scale: 0,
-        importance_score: 1,
-    },
-    {
-        id: '2001685',
-        name: '1685 Toro',
-        nasa_jpl_url: 'https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=2001685',
-        absolute_magnitude_h: 14.3,
-        estimated_diameter_km_min: 3.4,
-        estimated_diameter_km_max: 5.2,
-        estimated_diameter_m_min: 3400,
-        estimated_diameter_m_max: 5200,
-        estimated_diameter_mi_min: 2.11,
-        estimated_diameter_mi_max: 3.23,
-        estimated_diameter_ft_min: 11155,
-        estimated_diameter_ft_max: 17060,
-        is_potentially_hazardous_asteroid: true,
-        is_sentry_object: false,
-        close_approach_date: '2096-10-07',
-        close_approach_date_full: '2096-Oct-07 22:14',
-        epoch_date_close_approach: 4003027640000,
-        relative_velocity_km_s: 17.3,
-        relative_velocity_km_h: 62280,
-        relative_velocity_mph: 38695.2,
-        miss_distance_au: 0.041,
-        miss_distance_lunar: 15.9,
-        miss_distance_km: 6137000,
-        miss_distance_mi: 3813343,
-        orbiting_body: 'Earth',
-        impact: {
-            energy_megatons: 4200,
-            crater_km: 28,
-            risk_zones: ['South Atlantic', 'Brazilian Coast'],
-        },
-        torino_scale: 0,
-        importance_score: 4,
-    },
-    {
-        id: '2004197',
-        name: '4197 Morpheus',
-        nasa_jpl_url: 'https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=2004197',
-        absolute_magnitude_h: 19.8,
-        estimated_diameter_km_min: 0.92,
-        estimated_diameter_km_max: 0.92,
-        estimated_diameter_m_min: 920,
-        estimated_diameter_m_max: 920,
-        estimated_diameter_mi_min: 0.57,
-        estimated_diameter_mi_max: 0.57,
-        estimated_diameter_ft_min: 3018,
-        estimated_diameter_ft_max: 3018,
-        is_potentially_hazardous_asteroid: true,
-        is_sentry_object: true,
-        close_approach_date: '2126-08-11',
-        close_approach_date_full: '2126-Aug-11 07:28',
-        epoch_date_close_approach: 4948097280000,
-        relative_velocity_km_s: 9.8,
-        relative_velocity_km_h: 35280,
-        relative_velocity_mph: 21920.8,
-        miss_distance_au: 0.019,
-        miss_distance_lunar: 7.4,
-        miss_distance_km: 2843000,
-        miss_distance_mi: 1766763,
-        orbiting_body: 'Earth',
-        impact: {
-            energy_megatons: 1400,
-            crater_km: 16,
-            risk_zones: ['Northern Pacific', 'Alaska'],
-        },
-        torino_scale: 3,
-        importance_score: 8,
-    },
-    {
-        id: '2001981',
-        name: '1981 Midas',
-        nasa_jpl_url: 'https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=2001981',
-        absolute_magnitude_h: 15.5,
-        estimated_diameter_km_min: 2.0,
-        estimated_diameter_km_max: 2.0,
-        estimated_diameter_m_min: 2000,
-        estimated_diameter_m_max: 2000,
-        estimated_diameter_mi_min: 1.24,
-        estimated_diameter_mi_max: 1.24,
-        estimated_diameter_ft_min: 6562,
-        estimated_diameter_ft_max: 6562,
-        is_potentially_hazardous_asteroid: true,
-        is_sentry_object: false,
-        close_approach_date: '2085-03-15',
-        close_approach_date_full: '2085-Mar-15 13:42',
-        epoch_date_close_approach: 3635546520000,
-        relative_velocity_km_s: 26.5,
-        relative_velocity_km_h: 95400,
-        relative_velocity_mph: 59289.0,
-        miss_distance_au: 0.063,
-        miss_distance_lunar: 24.5,
-        miss_distance_km: 9426000,
-        miss_distance_mi: 5856146,
-        orbiting_body: 'Earth',
-        impact: {
-            energy_megatons: 2800,
-            crater_km: 22,
-            risk_zones: ['Red Sea', 'Middle East'],
-        },
-        torino_scale: 0,
-        importance_score: 4,
-    },
-    {
-        id: '2002100',
-        name: '2100 Ra-Shalom',
-        nasa_jpl_url: 'https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=2002100',
-        absolute_magnitude_h: 16.3,
-        estimated_diameter_km_min: 2.5,
-        estimated_diameter_km_max: 2.5,
-        estimated_diameter_m_min: 2500,
-        estimated_diameter_m_max: 2500,
-        estimated_diameter_mi_min: 1.55,
-        estimated_diameter_mi_max: 1.55,
-        estimated_diameter_ft_min: 8202,
-        estimated_diameter_ft_max: 8202,
-        is_potentially_hazardous_asteroid: false,
-        is_sentry_object: false,
-        close_approach_date: '2034-09-19',
-        close_approach_date_full: '2034-Sep-19 20:15',
-        epoch_date_close_approach: 2041327500000,
-        relative_velocity_km_s: 14.6,
-        relative_velocity_km_h: 52560,
-        relative_velocity_mph: 32659.6,
-        miss_distance_au: 0.092,
-        miss_distance_lunar: 35.8,
-        miss_distance_km: 13765000,
-        miss_distance_mi: 8551785,
-        orbiting_body: 'Earth',
-        impact: {
-            energy_megatons: 1200,
-            crater_km: 15,
-            risk_zones: ['Arctic Ocean'],
-        },
-        torino_scale: 0,
-        importance_score: 2,
-    },
-    {
-        id: '2001862',
-        name: '1862 Apollo',
-        nasa_jpl_url: 'https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=2001862',
-        absolute_magnitude_h: 16.25,
-        estimated_diameter_km_min: 1.5,
-        estimated_diameter_km_max: 1.5,
-        estimated_diameter_m_min: 1500,
-        estimated_diameter_m_max: 1500,
-        estimated_diameter_mi_min: 0.93,
-        estimated_diameter_mi_max: 0.93,
-        estimated_diameter_ft_min: 4921,
-        estimated_diameter_ft_max: 4921,
-        is_potentially_hazardous_asteroid: true,
-        is_sentry_object: false,
-        close_approach_date: '2039-11-07',
-        close_approach_date_full: '2039-Nov-07 11:33',
-        epoch_date_close_approach: 2204717580000,
-        relative_velocity_km_s: 21.8,
-        relative_velocity_km_h: 78480,
-        relative_velocity_mph: 48766.8,
-        miss_distance_au: 0.029,
-        miss_distance_lunar: 11.3,
-        miss_distance_km: 4340000,
-        miss_distance_mi: 2696260,
-        orbiting_body: 'Earth',
-        impact: {
-            energy_megatons: 1600,
-            crater_km: 18,
-            risk_zones: ['Eastern Pacific', 'South America West Coast'],
-        },
-        torino_scale: 0,
-        importance_score: 5,
-    },
-    {
-        id: '2001627',
-        name: '1627 Ivar',
-        nasa_jpl_url: 'https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=2001627',
-        absolute_magnitude_h: 12.8,
-        estimated_diameter_km_min: 8.1,
-        estimated_diameter_km_max: 9.1,
-        estimated_diameter_m_min: 8100,
-        estimated_diameter_m_max: 9100,
-        estimated_diameter_mi_min: 5.03,
-        estimated_diameter_mi_max: 5.65,
-        estimated_diameter_ft_min: 26575,
-        estimated_diameter_ft_max: 29856,
-        is_potentially_hazardous_asteroid: false,
-        is_sentry_object: false,
-        close_approach_date: '2047-01-12',
-        close_approach_date_full: '2047-Jan-12 04:27',
-        epoch_date_close_approach: 2430286020000,
-        relative_velocity_km_s: 11.9,
-        relative_velocity_km_h: 42840,
-        relative_velocity_mph: 26626.4,
-        miss_distance_au: 0.123,
-        miss_distance_lunar: 47.9,
-        miss_distance_km: 18404000,
-        miss_distance_mi: 11434884,
-        orbiting_body: 'Earth',
-        impact: {
-            energy_megatons: 18000,
-            crater_km: 55,
-            risk_zones: ['Global Devastation'],
-        },
-        torino_scale: 0,
-        importance_score: 6,
-    },
-    {
-        id: '2003200',
-        name: '3200 Phaethon',
-        nasa_jpl_url: 'https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=2003200',
-        absolute_magnitude_h: 14.6,
-        estimated_diameter_km_min: 5.8,
-        estimated_diameter_km_max: 5.8,
-        estimated_diameter_m_min: 5800,
-        estimated_diameter_m_max: 5800,
-        estimated_diameter_mi_min: 3.6,
-        estimated_diameter_mi_max: 3.6,
-        estimated_diameter_ft_min: 19029,
-        estimated_diameter_ft_max: 19029,
-        is_potentially_hazardous_asteroid: true,
-        is_sentry_object: false,
-        close_approach_date: '2093-12-14',
-        close_approach_date_full: '2093-Dec-14 20:20',
-        epoch_date_close_approach: 3912890400000,
-        relative_velocity_km_s: 10.9,
-        relative_velocity_km_h: 39240,
-        relative_velocity_mph: 24384.6,
-        miss_distance_au: 0.019,
-        miss_distance_lunar: 7.4,
-        miss_distance_km: 2843000,
-        miss_distance_mi: 1766763,
-        orbiting_body: 'Earth',
-        impact: {
-            energy_megatons: 9500,
-            crater_km: 42,
-            risk_zones: ['Indian Ocean', 'Indonesia'],
-        },
-        torino_scale: 0,
-        importance_score: 6,
-    },
-    {
-        id: '2006489',
-        name: '6489 Golevka',
-        nasa_jpl_url: 'https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=2006489',
-        absolute_magnitude_h: 19.2,
-        estimated_diameter_km_min: 0.53,
-        estimated_diameter_km_max: 0.53,
-        estimated_diameter_m_min: 530,
-        estimated_diameter_m_max: 530,
-        estimated_diameter_mi_min: 0.33,
-        estimated_diameter_mi_max: 0.33,
-        estimated_diameter_ft_min: 1739,
-        estimated_diameter_ft_max: 1739,
-        is_potentially_hazardous_asteroid: false,
-        is_sentry_object: false,
-        close_approach_date: '2040-07-24',
-        close_approach_date_full: '2040-Jul-24 15:19',
-        epoch_date_close_approach: 2226485940000,
-        relative_velocity_km_s: 18.6,
-        relative_velocity_km_h: 66960,
-        relative_velocity_mph: 41606.4,
-        miss_distance_au: 0.071,
-        miss_distance_lunar: 27.6,
-        miss_distance_km: 10622000,
-        miss_distance_mi: 6599458,
-        orbiting_body: 'Earth',
-        impact: {
-            energy_megatons: 180,
-            crater_km: 5,
-            risk_zones: ['North Sea'],
-        },
-        torino_scale: 0,
-        importance_score: 2,
-    },
-    {
-        id: '2001915',
-        name: '1915 Quetzalcoatl',
-        nasa_jpl_url: 'https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=2001915',
-        absolute_magnitude_h: 18.4,
-        estimated_diameter_km_min: 0.82,
-        estimated_diameter_km_max: 0.82,
-        estimated_diameter_m_min: 820,
-        estimated_diameter_m_max: 820,
-        estimated_diameter_mi_min: 0.51,
-        estimated_diameter_mi_max: 0.51,
-        estimated_diameter_ft_min: 2690,
-        estimated_diameter_ft_max: 2690,
-        is_potentially_hazardous_asteroid: false,
-        is_sentry_object: false,
-        close_approach_date: '2036-05-09',
-        close_approach_date_full: '2036-May-09 08:42',
-        epoch_date_close_approach: 2094114120000,
-        relative_velocity_km_s: 13.7,
-        relative_velocity_km_h: 49320,
-        relative_velocity_mph: 30650.2,
-        miss_distance_au: 0.055,
-        miss_distance_lunar: 21.4,
-        miss_distance_km: 8233000,
-        miss_distance_mi: 5114913,
-        orbiting_body: 'Earth',
-        impact: {
-            energy_megatons: 280,
-            crater_km: 6.5,
-            risk_zones: ['Gulf of Mexico'],
-        },
-        torino_scale: 0,
-        importance_score: 2,
-    },
-    {
-        id: '2001866',
-        name: '1866 Sisyphus',
-        nasa_jpl_url: 'https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=2001866',
-        absolute_magnitude_h: 12.4,
-        estimated_diameter_km_min: 8.5,
-        estimated_diameter_km_max: 8.5,
-        estimated_diameter_m_min: 8500,
-        estimated_diameter_m_max: 8500,
-        estimated_diameter_mi_min: 5.28,
-        estimated_diameter_mi_max: 5.28,
-        estimated_diameter_ft_min: 27887,
-        estimated_diameter_ft_max: 27887,
-        is_potentially_hazardous_asteroid: false,
-        is_sentry_object: false,
-        close_approach_date: '2071-11-25',
-        close_approach_date_full: '2071-Nov-25 12:18',
-        epoch_date_close_approach: 3217940280000,
-        relative_velocity_km_s: 15.2,
-        relative_velocity_km_h: 54720,
-        relative_velocity_mph: 33998.4,
-        miss_distance_au: 0.187,
-        miss_distance_lunar: 72.7,
-        miss_distance_km: 27971000,
-        miss_distance_mi: 17384171,
-        orbiting_body: 'Earth',
-        impact: {
-            energy_megatons: 22000,
-            crater_km: 60,
-            risk_zones: ['Global Mass Extinction'],
-        },
-        torino_scale: 0,
-        importance_score: 7,
-    },
-    {
-        id: '2001580',
-        name: '1580 Betulia',
-        nasa_jpl_url: 'https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=2001580',
-        absolute_magnitude_h: 15.4,
-        estimated_diameter_km_min: 4.6,
-        estimated_diameter_km_max: 4.6,
-        estimated_diameter_m_min: 4600,
-        estimated_diameter_m_max: 4600,
-        estimated_diameter_mi_min: 2.86,
-        estimated_diameter_mi_max: 2.86,
-        estimated_diameter_ft_min: 15092,
-        estimated_diameter_ft_max: 15092,
-        is_potentially_hazardous_asteroid: false,
-        is_sentry_object: false,
-        close_approach_date: '2043-08-06',
-        close_approach_date_full: '2043-Aug-06 17:55',
-        epoch_date_close_approach: 2322851700000,
-        relative_velocity_km_s: 8.3,
-        relative_velocity_km_h: 29880,
-        relative_velocity_mph: 18566.4,
-        miss_distance_au: 0.098,
-        miss_distance_lunar: 38.1,
-        miss_distance_km: 14662000,
-        miss_distance_mi: 9109322,
-        orbiting_body: 'Earth',
-        impact: {
-            energy_megatons: 4800,
-            crater_km: 30,
-            risk_zones: ['Southern Ocean'],
-        },
-        torino_scale: 0,
-        importance_score: 3,
-    },
-    {
-        id: '2001943',
-        name: '1943 Anteros',
-        nasa_jpl_url: 'https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=2001943',
-        absolute_magnitude_h: 15.7,
-        estimated_diameter_km_min: 2.0,
-        estimated_diameter_km_max: 2.0,
-        estimated_diameter_m_min: 2000,
-        estimated_diameter_m_max: 2000,
-        estimated_diameter_mi_min: 1.24,
-        estimated_diameter_mi_max: 1.24,
-        estimated_diameter_ft_min: 6562,
-        estimated_diameter_ft_max: 6562,
-        is_potentially_hazardous_asteroid: false,
-        is_sentry_object: false,
-        close_approach_date: '2061-12-30',
-        close_approach_date_full: '2061-Dec-30 23:47',
-        epoch_date_close_approach: 2903814420000,
-        relative_velocity_km_s: 12.1,
-        relative_velocity_km_h: 43560,
-        relative_velocity_mph: 27073.6,
-        miss_distance_au: 0.084,
-        miss_distance_lunar: 32.7,
-        miss_distance_km: 12569000,
-        miss_distance_mi: 7808069,
-        orbiting_body: 'Earth',
-        impact: {
-            energy_megatons: 1100,
-            crater_km: 14,
-            risk_zones: ['Tasman Sea'],
-        },
-        torino_scale: 0,
-        importance_score: 3,
-    },
-    {
-        id: '2003362',
-        name: '3362 Khufu',
-        nasa_jpl_url: 'https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=2003362',
-        absolute_magnitude_h: 20.1,
-        estimated_diameter_km_min: 0.65,
-        estimated_diameter_km_max: 0.65,
-        estimated_diameter_m_min: 650,
-        estimated_diameter_m_max: 650,
-        estimated_diameter_mi_min: 0.4,
-        estimated_diameter_mi_max: 0.4,
-        estimated_diameter_ft_min: 2133,
-        estimated_diameter_ft_max: 2133,
-        is_potentially_hazardous_asteroid: true,
-        is_sentry_object: false,
-        close_approach_date: '2052-08-31',
-        close_approach_date_full: '2052-Aug-31 09:14',
-        epoch_date_close_approach: 2607930840000,
-        relative_velocity_km_s: 23.8,
-        relative_velocity_km_h: 85680,
-        relative_velocity_mph: 53246.8,
-        miss_distance_au: 0.036,
-        miss_distance_lunar: 14.0,
-        miss_distance_km: 5386000,
-        miss_distance_mi: 3346746,
-        orbiting_body: 'Earth',
-        impact: {
-            energy_megatons: 520,
-            crater_km: 9,
-            risk_zones: ['Black Sea', 'Eastern Europe'],
-        },
-        torino_scale: 0,
-        importance_score: 4,
-    },
-    {
-        id: '2001036_2',
-        name: '1036 Ganymed B',
-        nasa_jpl_url: 'https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=2001036',
-        absolute_magnitude_h: 18.2,
-        estimated_diameter_km_min: 0.95,
-        estimated_diameter_km_max: 1.1,
-        estimated_diameter_m_min: 950,
-        estimated_diameter_m_max: 1100,
-        estimated_diameter_mi_min: 0.59,
-        estimated_diameter_mi_max: 0.68,
-        estimated_diameter_ft_min: 3117,
-        estimated_diameter_ft_max: 3609,
-        is_potentially_hazardous_asteroid: true,
-        is_sentry_object: true,
-        close_approach_date: '2118-03-15',
-        close_approach_date_full: '2118-Mar-15 11:30',
-        epoch_date_close_approach: 4679785800000,
-        relative_velocity_km_s: 8.7,
-        relative_velocity_km_h: 31320,
-        relative_velocity_mph: 19462.2,
-        miss_distance_au: 0.012,
-        miss_distance_lunar: 4.7,
-        miss_distance_km: 1796000,
-        miss_distance_mi: 1115684,
-        orbiting_body: 'Earth',
-        impact: {
-            energy_megatons: 2200,
-            crater_km: 20,
-            risk_zones: ['Western Pacific', 'Japan', 'Korea'],
-        },
-        torino_scale: 4,
-        importance_score: 9,
-    },
-    {
-        id: '2002101',
-        name: '2101 Adonis',
-        nasa_jpl_url: 'https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=2002101',
-        absolute_magnitude_h: 18.8,
-        estimated_diameter_km_min: 1.5,
-        estimated_diameter_km_max: 1.5,
-        estimated_diameter_m_min: 1500,
-        estimated_diameter_m_max: 1500,
-        estimated_diameter_mi_min: 0.93,
-        estimated_diameter_mi_max: 0.93,
-        estimated_diameter_ft_min: 4921,
-        estimated_diameter_ft_max: 4921,
-        is_potentially_hazardous_asteroid: true,
-        is_sentry_object: false,
-        close_approach_date: '2036-02-07',
-        close_approach_date_full: '2036-Feb-07 14:22',
-        epoch_date_close_approach: 2087146920000,
-        relative_velocity_km_s: 25.4,
-        relative_velocity_km_h: 91440,
-        relative_velocity_mph: 56830.4,
-        miss_distance_au: 0.015,
-        miss_distance_lunar: 5.8,
-        miss_distance_km: 2245000,
-        miss_distance_mi: 1394595,
-        orbiting_body: 'Earth',
-        impact: {
-            energy_megatons: 3200,
-            crater_km: 25,
-            risk_zones: ['Central Atlantic', 'Western Africa'],
-        },
-        torino_scale: 1,
-        importance_score: 7,
-    },
-    {
-        id: '2004660',
-        name: '4660 Nereus',
-        nasa_jpl_url: 'https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=2004660',
-        absolute_magnitude_h: 17.6,
-        estimated_diameter_km_min: 0.33,
-        estimated_diameter_km_max: 0.33,
-        estimated_diameter_m_min: 330,
-        estimated_diameter_m_max: 330,
-        estimated_diameter_mi_min: 0.205,
-        estimated_diameter_mi_max: 0.205,
-        estimated_diameter_ft_min: 1083,
-        estimated_diameter_ft_max: 1083,
-        is_potentially_hazardous_asteroid: false,
-        is_sentry_object: false,
-        close_approach_date: '2029-02-14',
-        close_approach_date_full: '2029-Feb-14 06:10',
-        epoch_date_close_approach: 1865583000000,
-        relative_velocity_km_s: 3.9,
-        relative_velocity_km_h: 14040,
-        relative_velocity_mph: 8724.9,
-        miss_distance_au: 0.012,
-        miss_distance_lunar: 4.7,
-        miss_distance_km: 1796000,
-        miss_distance_mi: 1115684,
-        orbiting_body: 'Earth',
-        impact: {
-            energy_megatons: 45,
-            crater_km: 2.2,
-            risk_zones: ['Baltic Sea'],
-        },
-        torino_scale: 0,
-        importance_score: 2,
-    },
-    {
-        id: '2000216',
-        name: '216 Kleopatra',
-        nasa_jpl_url: 'https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=2000216',
-        absolute_magnitude_h: 7.3,
-        estimated_diameter_km_min: 124.0,
-        estimated_diameter_km_max: 124.0,
-        estimated_diameter_m_min: 124000,
-        estimated_diameter_m_max: 124000,
-        estimated_diameter_mi_min: 77.05,
-        estimated_diameter_mi_max: 77.05,
-        estimated_diameter_ft_min: 406824,
-        estimated_diameter_ft_max: 406824,
-        is_potentially_hazardous_asteroid: false,
-        is_sentry_object: false,
-        close_approach_date: '2176-09-12',
-        close_approach_date_full: '2176-Sep-12 03:47',
-        epoch_date_close_approach: 6527394420000,
-        relative_velocity_km_s: 18.2,
-        relative_velocity_km_h: 65520,
-        relative_velocity_mph: 40711.2,
-        miss_distance_au: 0.423,
-        miss_distance_lunar: 164.5,
-        miss_distance_km: 63279000,
-        miss_distance_mi: 39308979,
-        orbiting_body: 'Earth',
-        impact: {
-            energy_megatons: 750000000,
-            crater_km: 800,
-            risk_zones: ['Global Extinction Event'],
-        },
-        torino_scale: 0,
-        importance_score: 8,
-    },
-    {
-        id: '2065803',
-        name: '65803 Didymos',
-        nasa_jpl_url: 'https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=2065803',
-        absolute_magnitude_h: 18.16,
-        estimated_diameter_km_min: 0.78,
-        estimated_diameter_km_max: 0.78,
-        estimated_diameter_m_min: 780,
-        estimated_diameter_m_max: 780,
-        estimated_diameter_mi_min: 0.48,
-        estimated_diameter_mi_max: 0.48,
-        estimated_diameter_ft_min: 2559,
-        estimated_diameter_ft_max: 2559,
-        is_potentially_hazardous_asteroid: true,
-        is_sentry_object: false,
-        close_approach_date: '2123-09-30',
-        close_approach_date_full: '2123-Sep-30 12:18',
-        epoch_date_close_approach: 4857031080000,
-        relative_velocity_km_s: 4.14,
-        relative_velocity_km_h: 14904,
-        relative_velocity_mph: 9261.5,
-        miss_distance_au: 0.038,
-        miss_distance_lunar: 14.8,
-        miss_distance_km: 5684000,
-        miss_distance_mi: 3531996,
-        orbiting_body: 'Earth',
-        impact: {
-            energy_megatons: 380,
-            crater_km: 7.5,
-            risk_zones: ['Bering Sea'],
-        },
-        torino_scale: 0,
-        importance_score: 4,
-    },
-].sort((a, b) => b.importance_score - a.importance_score);
+// CALCULATION FUNCTIONS
+function calculateImpactEnergy(diameterKm: number, velocityKmS: number): number {
+    const density = 2500;
+    const radiusM = (diameterKm * 1000) / 2;
+    const volumeM3 = (4 / 3) * Math.PI * radiusM ** 3;
+    const massKg = volumeM3 * density;
+
+    const velocityMS = velocityKmS * 1000;
+    const energyJoules = 0.5 * massKg * velocityMS ** 2;
+
+    const megatonsTNT = energyJoules / 4.184e15;
+
+    return megatonsTNT;
+}
+
+function calculateTorinoScale(
+    diameterKm: number,
+    energyMegatons: number,
+    isPHA: boolean,
+    isSentry: boolean,
+): number {
+    if (isSentry) {
+        if (energyMegatons > 1000000) return 10;
+        if (energyMegatons > 100000) return 9;
+        if (energyMegatons > 10000) return 8;
+        if (energyMegatons > 1000) return 7;
+        if (diameterKm > 1) return 4;
+        return 3;
+    }
+
+    if (isPHA) {
+        if (energyMegatons > 100000) return 3;
+        if (diameterKm > 1) return 2;
+        return 1;
+    }
+
+    return 0;
+}
+
+function calculateCraterSize(diameterKm: number, velocityKmS: number): number {
+    const craterDiameterKm = diameterKm * 20 * (velocityKmS / 20) ** 0.33;
+    return craterDiameterKm;
+}
+
+function generateRiskZones(energyMegatons: number, isPHA: boolean, isSentry: boolean): string[] {
+    const zones: string[] = [];
+
+    if (energyMegatons > 100000) {
+        zones.push('Global Extinction Event', 'Mass Extinction Event', 'Global Devastation');
+    } else if (energyMegatons > 10000) {
+        zones.push('Continental Devastation', 'Global Impact', 'Multiple Continents');
+    } else if (energyMegatons > 1000) {
+        zones.push('Regional Damage', 'Pacific Ocean', 'Atlantic Ocean', 'Indian Ocean');
+    } else if (energyMegatons > 100) {
+        zones.push('Pacific Ocean', 'Coastal Japan', 'Western Pacific');
+    } else if (energyMegatons > 10) {
+        zones.push('Remote Ocean', 'Central Pacific', 'North Atlantic');
+    } else {
+        zones.push('Remote Ocean');
+    }
+
+    return zones;
+}
+
+function calculateImportanceScore(
+    diameterKm: number,
+    velocityKmS: number,
+    missDistanceAU: number,
+    isPHA: boolean,
+    isSentry: boolean,
+): number {
+    let score = 0;
+
+    if (diameterKm > 10) score += 4;
+    else if (diameterKm > 1) score += 3;
+    else if (diameterKm > 0.5) score += 2;
+    else score += 1;
+
+    if (velocityKmS > 25) score += 2;
+    else if (velocityKmS > 15) score += 1;
+
+    if (missDistanceAU < 0.05) score += 2;
+    else if (missDistanceAU < 0.2) score += 1;
+
+    if (isSentry) score += 3;
+    else if (isPHA) score += 2;
+
+    return Math.min(score, 10);
+}
 
 function createStarField() {
     const starsGeometry = new THREE.BufferGeometry();
@@ -1437,6 +405,7 @@ function createImpactTrajectory(asteroidPosition: THREE.Vector3, riskZones: stri
         'Bering Sea': { lat: 58, lng: -175 },
         'North America': { lat: 45, lng: -100 },
         Canada: { lat: 60, lng: -110 },
+        'Multiple Continents': { lat: 0, lng: 0 },
     };
 
     riskZones.forEach((zone) => {
@@ -1504,9 +473,14 @@ export default function App(): JSX.Element {
     const [selectedAsteroid, setSelectedAsteroid] = useState<AsteroidData | null>(null);
     const [hoveredAsteroid, setHoveredAsteroid] = useState<AsteroidData | null>(null);
     const [showOrbits, setShowOrbits] = useState<boolean>(true);
-    const [maxAsteroids, setMaxAsteroids] = useState<number>(ASTEROID_DATA.length);
+    const [maxAsteroids, setMaxAsteroids] = useState<number>(0);
     const [cameraDistance, setCameraDistance] = useState<number>(35);
     const [isGeneratingReport, setIsGeneratingReport] = useState<boolean>(false);
+
+    const [asteroidData, setAsteroidData] = useState<AsteroidData[]>([]);
+    const [isLoadingAsteroids, setIsLoadingAsteroids] = useState<boolean>(true);
+    const [loadError, setLoadError] = useState<string | null>(null);
+
     const [expandedPanels, setExpandedPanels] = useState<{
         asteroidMonitor: boolean;
         legend: boolean;
@@ -1532,17 +506,94 @@ export default function App(): JSX.Element {
         selectedAsteroidRef.current = selectedAsteroid;
     }, [selectedAsteroid]);
 
+    useEffect(() => {
+        const fetchAsteroidData = async () => {
+            setIsLoadingAsteroids(true);
+            setLoadError(null);
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/database/asteroids`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const data: any[] = await response.json();
+
+                const enrichedData: AsteroidData[] = data.map((asteroid) => {
+                    const diameterKm = asteroid.estimated_diameter_km_max;
+                    const velocityKmS = asteroid.relative_velocity_km_s;
+                    const missDistanceAU = asteroid.miss_distance_au;
+                    const isPHA = asteroid.is_potentially_hazardous_asteroid;
+                    const isSentry = asteroid.is_sentry_object;
+
+                    const energyMegatons = calculateImpactEnergy(diameterKm, velocityKmS);
+                    const torinoScale = calculateTorinoScale(
+                        diameterKm,
+                        energyMegatons,
+                        isPHA,
+                        isSentry,
+                    );
+                    const craterKm = calculateCraterSize(diameterKm, velocityKmS);
+                    const riskZones = generateRiskZones(energyMegatons, isPHA, isSentry);
+                    const importanceScore = calculateImportanceScore(
+                        diameterKm,
+                        velocityKmS,
+                        missDistanceAU,
+                        isPHA,
+                        isSentry,
+                    );
+
+                    return {
+                        ...asteroid,
+                        impact: {
+                            energy_megatons: energyMegatons,
+                            crater_km: craterKm,
+                            risk_zones: riskZones,
+                        },
+                        torino_scale: torinoScale,
+                        importance_score: importanceScore,
+                    };
+                });
+
+                const sortedData = enrichedData.sort(
+                    (a, b) => b.importance_score - a.importance_score,
+                );
+
+                setAsteroidData(sortedData);
+                setMaxAsteroids(sortedData.length);
+
+                console.log(`🛰️ Loaded ${sortedData.length} asteroids from API`);
+                console.log(`✅ Computed Torino scales and impact energies`);
+            } catch (error) {
+                console.error('Failed to fetch asteroid data:', error);
+                setLoadError(error instanceof Error ? error.message : 'Unknown error occurred');
+
+                setAsteroidData([]);
+                setMaxAsteroids(0);
+            } finally {
+                setIsLoadingAsteroids(false);
+            }
+        };
+
+        fetchAsteroidData();
+    }, []);
+
     const animationSpeed = 1.0;
     const visibleAsteroids = useMemo(() => {
-        return ASTEROID_DATA.slice(0, maxAsteroids);
-    }, [maxAsteroids]);
+        return asteroidData.slice(0, maxAsteroids);
+    }, [maxAsteroids, asteroidData]);
 
-    // Multi-asteroid report function (for main menu)
     const generateAIReport = async () => {
         setIsGeneratingReport(true);
         try {
             const asteroidIds = visibleAsteroids.map((asteroid) => asteroid.id);
-            const response = await fetch('/reports', {
+            const response = await fetch(`${API_BASE_URL}/ai/report`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -1572,13 +623,12 @@ export default function App(): JSX.Element {
         }
     };
 
-    // Single asteroid report function (for selected asteroid)
     const generateSingleAsteroidReport = async () => {
         if (!selectedAsteroid) return;
 
         setIsGeneratingReport(true);
         try {
-            const response = await fetch('/reports', {
+            const response = await fetch(`${API_BASE_URL}/ai/report`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -1617,9 +667,16 @@ export default function App(): JSX.Element {
         }));
     };
 
+    const togglePanel = (panel: keyof typeof expandedPanels) => {
+        setExpandedPanels((prev) => ({
+            ...prev,
+            [panel]: !prev[panel],
+        }));
+    };
+
     // DYNAMIC RING CREATION SYSTEM - Creates as many rings as needed
     const recreateAsteroids = () => {
-        if (!sceneRef.current) return;
+        if (!sceneRef.current || visibleAsteroids.length === 0) return;
         const scene = sceneRef.current;
 
         Object.values(asteroidMeshes.current).forEach((mesh) => {
@@ -1631,7 +688,6 @@ export default function App(): JSX.Element {
         });
         asteroidMeshes.current = {};
 
-        // DYNAMIC RING SYSTEM - Creates as many rings as needed
         const calculateDynamicRings = () => {
             const maxAsteroidsPerRing = 5; // Max asteroids per ring before creating new ring
             const baseDistance = 15; // Starting distance for first ring
@@ -1758,10 +814,8 @@ export default function App(): JSX.Element {
             if (!ring) return; // Safety check
 
             let distance = ring.distance;
-            // SLIGHTLY INCREASED random variation for better spacing
             distance += (Math.random() - 0.5) * 3;
 
-            // ENHANCED SIZE CALCULATION
             let size;
             const diameterKm = asteroid.estimated_diameter_km_max;
 
@@ -1787,7 +841,6 @@ export default function App(): JSX.Element {
             if (totalInThisRing === 1) {
                 initialAngle = 0;
             } else {
-                // Evenly distribute around the ring
                 initialAngle = (asteroidIndexInRing / totalInThisRing) * Math.PI * 2;
             }
 
@@ -1795,7 +848,6 @@ export default function App(): JSX.Element {
             const z = Math.sin(initialAngle) * distance;
             const y = (Math.random() - 0.5) * 1;
 
-            // ENHANCED COLOR CODING based on type
             let color = 0xdddddd;
             let emissive = 0x111111;
 
@@ -1813,7 +865,6 @@ export default function App(): JSX.Element {
                 emissive = 0x111111;
             }
 
-            // Create asteroid mesh
             const asteroidMesh = createDetailedAsteroid(size, color);
             asteroidMesh.userData = asteroid;
             const typedMesh = asteroidMesh as unknown as AsteroidMesh;
@@ -1837,13 +888,11 @@ export default function App(): JSX.Element {
             asteroidMeshes.current[asteroid.id] = typedMesh;
         });
 
-        // CREATE VISUAL RINGS
         if (showOrbits) {
             // Remove old rings
             const oldRings = scene.children.filter((child) => child.userData?.isOrbitRing);
             oldRings.forEach((ring) => scene.remove(ring));
 
-            // Create new dynamic rings
             rings.forEach((ring, ringIndex) => {
                 const orbitGeometry = new THREE.RingGeometry(
                     ring.distance - 0.5,
@@ -1876,14 +925,13 @@ export default function App(): JSX.Element {
     };
 
     useEffect(() => {
-        if (isInitialized.current) {
+        if (isInitialized.current && !isLoadingAsteroids) {
             recreateAsteroids();
         }
-    }, [maxAsteroids, visibleAsteroids]);
+    }, [maxAsteroids, visibleAsteroids, asteroidData, isLoadingAsteroids]);
 
-    // Handle orbit visibility toggle
     useEffect(() => {
-        if (isInitialized.current && sceneRef.current) {
+        if (isInitialized.current && sceneRef.current && !isLoadingAsteroids) {
             const scene = sceneRef.current;
 
             // Remove all orbit rings
@@ -1891,14 +939,13 @@ export default function App(): JSX.Element {
             oldRings.forEach((ring) => scene.remove(ring));
 
             if (showOrbits) {
-                // Recreate with current dynamic distances
                 recreateAsteroids();
             }
         }
-    }, [showOrbits]);
+    }, [showOrbits, isLoadingAsteroids]);
 
     useEffect(() => {
-        if (!mountRef.current || isInitialized.current) return;
+        if (!mountRef.current || isInitialized.current || isLoadingAsteroids) return;
         isInitialized.current = true;
 
         const scene = new THREE.Scene();
@@ -1944,12 +991,11 @@ export default function App(): JSX.Element {
         controls.enableRotate = true;
         controls.enablePan = true;
         controls.minDistance = 8;
-        controls.maxDistance = 200; // INCREASED maximum zoom distance
+        controls.maxDistance = 200;
         controls.maxPolarAngle = Math.PI;
         controls.autoRotate = false;
         controlsRef.current = controls;
 
-        // Initial orbit rings will be created by recreateAsteroids() function
         recreateAsteroids();
 
         const raycaster = new THREE.Raycaster();
@@ -2085,7 +1131,6 @@ export default function App(): JSX.Element {
 
             const time = Date.now() * 0.001;
 
-            // FIXED: Ensure all asteroids orbit properly around Earth
             if (!isAnimationsPaused) {
                 Object.values(asteroidMeshes.current).forEach((mesh) => {
                     const asteroid = mesh.userData;
@@ -2101,10 +1146,9 @@ export default function App(): JSX.Element {
                         mesh.orbitCenter
                     ) {
                         mesh.orbitAngle += mesh.orbitSpeed * animationSpeed;
-                        // FIXED: All orbits centered on Earth (0,0,0)
                         mesh.position.x = Math.cos(mesh.orbitAngle) * mesh.orbitRadius;
                         mesh.position.z = Math.sin(mesh.orbitAngle) * mesh.orbitRadius;
-                        mesh.position.y = mesh.orbitCenter.y; // Maintain slight Y variation
+                        mesh.position.y = mesh.orbitCenter.y;
                     }
                 });
             }
@@ -2177,7 +1221,7 @@ export default function App(): JSX.Element {
             renderer.dispose();
             isInitialized.current = false;
         };
-    }, []);
+    }, [isLoadingAsteroids]);
 
     const getRiskLevel = (asteroid: AsteroidData): string => {
         if (asteroid.is_sentry_object) return 'CRITICAL';
@@ -2202,6 +1246,76 @@ export default function App(): JSX.Element {
     const formatNumber = (num: number): string => {
         return num.toLocaleString('en-US', { maximumFractionDigits: 2 });
     };
+
+    if (isLoadingAsteroids) {
+        return (
+            <div
+                className="flex h-screen items-center justify-center"
+                style={{ backgroundColor: '#051622' }}
+            >
+                <div className="text-center">
+                    <div
+                        className="w-12 h-12 border-4 border-t-transparent rounded-full animate-spin mx-auto mb-4"
+                        style={{ borderColor: '#1ba098' }}
+                    ></div>
+                    <h2 className="text-2xl font-light mb-2" style={{ color: '#1ba098' }}>
+                        Loading Asteroid Data
+                    </h2>
+                    <p className="text-sm opacity-70" style={{ color: '#deb992' }}>
+                        Fetching from database...
+                    </p>
+                </div>
+            </div>
+        );
+    }
+
+    if (loadError) {
+        return (
+            <div
+                className="flex h-screen items-center justify-center"
+                style={{ backgroundColor: '#051622' }}
+            >
+                <div className="text-center max-w-md">
+                    <div className="text-red-400 text-4xl mb-4">⚠️</div>
+                    <h2 className="text-2xl font-light mb-4" style={{ color: '#1ba098' }}>
+                        Failed to Load Data
+                    </h2>
+                    <p className="text-sm mb-4" style={{ color: '#deb992' }}>
+                        {loadError}
+                    </p>
+                    <button
+                        onClick={() => window.location.reload()}
+                        className="px-6 py-3 rounded-xl font-medium transition-all hover:scale-105"
+                        style={{
+                            background: 'linear-gradient(135deg, #1ba098, #0d7377)',
+                            color: '#051622',
+                        }}
+                    >
+                        Retry
+                    </button>
+                </div>
+            </div>
+        );
+    }
+
+    if (!asteroidData.length) {
+        return (
+            <div
+                className="flex h-screen items-center justify-center"
+                style={{ backgroundColor: '#051622' }}
+            >
+                <div className="text-center">
+                    <div className="text-yellow-400 text-4xl mb-4">📡</div>
+                    <h2 className="text-2xl font-light mb-4" style={{ color: '#1ba098' }}>
+                        No Asteroid Data
+                    </h2>
+                    <p className="text-sm" style={{ color: '#deb992' }}>
+                        No asteroids found in database
+                    </p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="flex h-screen" style={{ backgroundColor: '#051622', color: '#deb992' }}>
@@ -2251,6 +1365,26 @@ export default function App(): JSX.Element {
                                         type="range"
                                         min="1"
                                         max={ASTEROID_DATA.length}
+                                        step="1"
+                                        value={maxAsteroids}
+                                        onChange={(e) =>
+                                            setMaxAsteroids(Number.parseInt(e.target.value))
+                                        }
+                                        className="w-full h-2 rounded-lg appearance-none cursor-pointer"
+                                        style={{
+                                            background: 'rgba(222, 185, 146, 0.2)',
+                                            accentColor: '#1ba098',
+                                        }}
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="block text-sm font-medium">
+                                        Objects: {maxAsteroids} / {asteroidData.length}
+                                    </label>
+                                    <input
+                                        type="range"
+                                        min="1"
+                                        max={asteroidData.length}
                                         step="1"
                                         value={maxAsteroids}
                                         onChange={(e) =>
