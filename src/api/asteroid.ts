@@ -41,15 +41,9 @@ const api = axios.create({
 /**
  * Fetch asteroids basic data from api
  */
-export const getAsteroidsData = async (
-    start_date: string,
-    end_date: string,
-): Promise<AsteroidApiResponse> => {
+export const getAsteroidsData = async (date: string): Promise<AsteroidApiResponse> => {
     try {
-        const response = await api.get('/asteroids', {
-            params: { start_date, end_date },
-        });
-
+        const response = await api.get(`/asteroids/${date}`);
         return {
             data: response.data,
             error: null,
