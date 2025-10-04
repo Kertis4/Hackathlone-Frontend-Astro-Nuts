@@ -8,4 +8,4 @@ const config = {
     tabWidth: 4,
     htmlWhitespaceSensitivity: 'strict',
 };
-export default config;
+ export default config;
