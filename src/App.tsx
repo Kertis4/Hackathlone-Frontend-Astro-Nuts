@@ -1,9 +1,7 @@
-import React from 'react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-// TypeScript interfaces
 interface AsteroidData {
     id: string;
     name: string;
@@ -52,7 +50,6 @@ interface AsteroidMesh extends THREE.Mesh {
     orbitCenter?: THREE.Vector3;
 }
 
-// Asteroid data
 const ASTEROID_DATA: AsteroidData[] = [
     {
         id: '2465633',
@@ -157,40 +154,6 @@ const ASTEROID_DATA: AsteroidData[] = [
         importance_score: 8,
     },
     {
-        id: '2001036',
-        name: '1036 Ganymed',
-        nasa_jpl_url: 'https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=2001036',
-        absolute_magnitude_h: 9.45,
-        estimated_diameter_km_min: 31.7,
-        estimated_diameter_km_max: 38.9,
-        estimated_diameter_m_min: 31700,
-        estimated_diameter_m_max: 38900,
-        estimated_diameter_mi_min: 19.7,
-        estimated_diameter_mi_max: 24.2,
-        estimated_diameter_ft_min: 104000,
-        estimated_diameter_ft_max: 127600,
-        is_potentially_hazardous_asteroid: false,
-        is_sentry_object: false,
-        close_approach_date: '2024-10-13',
-        close_approach_date_full: '2024-Oct-13 14:56',
-        epoch_date_close_approach: 1728825360000,
-        relative_velocity_km_s: 19.56,
-        relative_velocity_km_h: 70416,
-        relative_velocity_mph: 43750.8,
-        miss_distance_au: 0.381,
-        miss_distance_lunar: 148.2,
-        miss_distance_km: 57000000,
-        miss_distance_mi: 35418600,
-        orbiting_body: 'Earth',
-        impact: {
-            energy_megatons: 50000,
-            crater_km: 45,
-            risk_zones: ['Global Impact', 'Mass Extinction Event'],
-        },
-        torino_scale: 0,
-        importance_score: 7,
-    },
-    {
         id: '2000433',
         name: '433 Eros',
         nasa_jpl_url: 'https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=2000433',
@@ -223,6 +186,40 @@ const ASTEROID_DATA: AsteroidData[] = [
         },
         torino_scale: 0,
         importance_score: 4,
+    },
+    {
+        id: '2001036',
+        name: '1036 Ganymed',
+        nasa_jpl_url: 'https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=2001036',
+        absolute_magnitude_h: 9.45,
+        estimated_diameter_km_min: 31.7,
+        estimated_diameter_km_max: 38.9,
+        estimated_diameter_m_min: 31700,
+        estimated_diameter_m_max: 38900,
+        estimated_diameter_mi_min: 19.7,
+        estimated_diameter_mi_max: 24.2,
+        estimated_diameter_ft_min: 104000,
+        estimated_diameter_ft_max: 127600,
+        is_potentially_hazardous_asteroid: false,
+        is_sentry_object: false,
+        close_approach_date: '2024-10-13',
+        close_approach_date_full: '2024-Oct-13 14:56',
+        epoch_date_close_approach: 1728825360000,
+        relative_velocity_km_s: 19.56,
+        relative_velocity_km_h: 70416,
+        relative_velocity_mph: 43750.8,
+        miss_distance_au: 0.381,
+        miss_distance_lunar: 148.2,
+        miss_distance_km: 57000000,
+        miss_distance_mi: 35418600,
+        orbiting_body: 'Earth',
+        impact: {
+            energy_megatons: 50000,
+            crater_km: 45,
+            risk_zones: ['Global Impact', 'Mass Extinction Event'],
+        },
+        torino_scale: 0,
+        importance_score: 7,
     },
     {
         id: '2004769',
@@ -258,13 +255,931 @@ const ASTEROID_DATA: AsteroidData[] = [
         torino_scale: 0,
         importance_score: 2,
     },
+    // NEW 25 ASTEROIDS FOR SCALING DEMONSTRATION
+    {
+        id: '2101955',
+        name: '101955 Bennu',
+        nasa_jpl_url: 'https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=2101955',
+        absolute_magnitude_h: 20.9,
+        estimated_diameter_km_min: 0.49,
+        estimated_diameter_km_max: 0.56,
+        estimated_diameter_m_min: 490,
+        estimated_diameter_m_max: 560,
+        estimated_diameter_mi_min: 0.304,
+        estimated_diameter_mi_max: 0.348,
+        estimated_diameter_ft_min: 1608,
+        estimated_diameter_ft_max: 1837,
+        is_potentially_hazardous_asteroid: true,
+        is_sentry_object: true,
+        close_approach_date: '2135-09-25',
+        close_approach_date_full: '2135-Sep-25 16:24',
+        epoch_date_close_approach: 5234567890000,
+        relative_velocity_km_s: 11.2,
+        relative_velocity_km_h: 40320,
+        relative_velocity_mph: 25055.4,
+        miss_distance_au: 0.0031,
+        miss_distance_lunar: 1.21,
+        miss_distance_km: 463000,
+        miss_distance_mi: 287658,
+        orbiting_body: 'Earth',
+        impact: {
+            energy_megatons: 1200,
+            crater_km: 15,
+            risk_zones: ['North America', 'Canada'],
+        },
+        torino_scale: 4,
+        importance_score: 9,
+    },
+    {
+        id: '2004015',
+        name: '4015 Wilson-Harrington',
+        nasa_jpl_url: 'https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=2004015',
+        absolute_magnitude_h: 16.1,
+        estimated_diameter_km_min: 2.8,
+        estimated_diameter_km_max: 3.2,
+        estimated_diameter_m_min: 2800,
+        estimated_diameter_m_max: 3200,
+        estimated_diameter_mi_min: 1.74,
+        estimated_diameter_mi_max: 1.99,
+        estimated_diameter_ft_min: 9186,
+        estimated_diameter_ft_max: 10499,
+        is_potentially_hazardous_asteroid: true,
+        is_sentry_object: false,
+        close_approach_date: '2027-11-14',
+        close_approach_date_full: '2027-Nov-14 08:15',
+        epoch_date_close_approach: 1826123700000,
+        relative_velocity_km_s: 15.8,
+        relative_velocity_km_h: 56880,
+        relative_velocity_mph: 35340.6,
+        miss_distance_au: 0.045,
+        miss_distance_lunar: 17.5,
+        miss_distance_km: 6735000,
+        miss_distance_mi: 4184775,
+        orbiting_body: 'Earth',
+        impact: {
+            energy_megatons: 2500,
+            crater_km: 20,
+            risk_zones: ['Mediterranean Sea', 'Southern Europe'],
+        },
+        torino_scale: 1,
+        importance_score: 6,
+    },
+    {
+        id: '2162173',
+        name: '162173 Ryugu',
+        nasa_jpl_url: 'https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=2162173',
+        absolute_magnitude_h: 19.2,
+        estimated_diameter_km_min: 0.87,
+        estimated_diameter_km_max: 1.02,
+        estimated_diameter_m_min: 870,
+        estimated_diameter_m_max: 1020,
+        estimated_diameter_mi_min: 0.541,
+        estimated_diameter_mi_max: 0.634,
+        estimated_diameter_ft_min: 2854,
+        estimated_diameter_ft_max: 3346,
+        is_potentially_hazardous_asteroid: true,
+        is_sentry_object: false,
+        close_approach_date: '2026-12-05',
+        close_approach_date_full: '2026-Dec-05 11:42',
+        epoch_date_close_approach: 1796678520000,
+        relative_velocity_km_s: 13.4,
+        relative_velocity_km_h: 48240,
+        relative_velocity_mph: 29968.4,
+        miss_distance_au: 0.038,
+        miss_distance_lunar: 14.8,
+        miss_distance_km: 5684000,
+        miss_distance_mi: 3531996,
+        orbiting_body: 'Earth',
+        impact: {
+            energy_megatons: 1800,
+            crater_km: 18,
+            risk_zones: ['South China Sea', 'Philippines'],
+        },
+        torino_scale: 1,
+        importance_score: 6,
+    },
+    {
+        id: '2001620',
+        name: '1620 Geographos',
+        nasa_jpl_url: 'https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=2001620',
+        absolute_magnitude_h: 15.6,
+        estimated_diameter_km_min: 4.8,
+        estimated_diameter_km_max: 5.1,
+        estimated_diameter_m_min: 4800,
+        estimated_diameter_m_max: 5100,
+        estimated_diameter_mi_min: 2.98,
+        estimated_diameter_mi_max: 3.17,
+        estimated_diameter_ft_min: 15748,
+        estimated_diameter_ft_max: 16732,
+        is_potentially_hazardous_asteroid: true,
+        is_sentry_object: false,
+        close_approach_date: '2030-08-23',
+        close_approach_date_full: '2030-Aug-23 14:35',
+        epoch_date_close_approach: 1914159300000,
+        relative_velocity_km_s: 20.1,
+        relative_velocity_km_h: 72360,
+        relative_velocity_mph: 44958.1,
+        miss_distance_au: 0.052,
+        miss_distance_lunar: 20.2,
+        miss_distance_km: 7784000,
+        miss_distance_mi: 4836016,
+        orbiting_body: 'Earth',
+        impact: {
+            energy_megatons: 8500,
+            crater_km: 35,
+            risk_zones: ['Arabian Sea', 'Western India'],
+        },
+        torino_scale: 0,
+        importance_score: 5,
+    },
+    {
+        id: '2002063',
+        name: '2063 Bacchus',
+        nasa_jpl_url: 'https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=2002063',
+        absolute_magnitude_h: 19.1,
+        estimated_diameter_km_min: 1.1,
+        estimated_diameter_km_max: 1.3,
+        estimated_diameter_m_min: 1100,
+        estimated_diameter_m_max: 1300,
+        estimated_diameter_mi_min: 0.68,
+        estimated_diameter_mi_max: 0.81,
+        estimated_diameter_ft_min: 3609,
+        estimated_diameter_ft_max: 4265,
+        is_potentially_hazardous_asteroid: false,
+        is_sentry_object: false,
+        close_approach_date: '2032-04-17',
+        close_approach_date_full: '2032-Apr-17 09:22',
+        epoch_date_close_approach: 1965567720000,
+        relative_velocity_km_s: 16.7,
+        relative_velocity_km_h: 60120,
+        relative_velocity_mph: 37344.7,
+        miss_distance_au: 0.089,
+        miss_distance_lunar: 34.6,
+        miss_distance_km: 13317000,
+        miss_distance_mi: 8273561,
+        orbiting_body: 'Earth',
+        impact: {
+            energy_megatons: 950,
+            crater_km: 12,
+            risk_zones: ['Bay of Bengal'],
+        },
+        torino_scale: 0,
+        importance_score: 3,
+    },
+    {
+        id: '2001566',
+        name: '1566 Icarus',
+        nasa_jpl_url: 'https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=2001566',
+        absolute_magnitude_h: 16.9,
+        estimated_diameter_km_min: 1.4,
+        estimated_diameter_km_max: 1.4,
+        estimated_diameter_m_min: 1400,
+        estimated_diameter_m_max: 1400,
+        estimated_diameter_mi_min: 0.87,
+        estimated_diameter_mi_max: 0.87,
+        estimated_diameter_ft_min: 4593,
+        estimated_diameter_ft_max: 4593,
+        is_potentially_hazardous_asteroid: false,
+        is_sentry_object: false,
+        close_approach_date: '2029-06-16',
+        close_approach_date_full: '2029-Jun-16 03:18',
+        epoch_date_close_approach: 1876716980000,
+        relative_velocity_km_s: 31.2,
+        relative_velocity_km_h: 112320,
+        relative_velocity_mph: 69784.4,
+        miss_distance_au: 0.042,
+        miss_distance_lunar: 16.3,
+        miss_distance_km: 6286000,
+        miss_distance_mi: 3905906,
+        orbiting_body: 'Earth',
+        impact: {
+            energy_megatons: 420,
+            crater_km: 8,
+            risk_zones: ['Caribbean Sea'],
+        },
+        torino_scale: 0,
+        importance_score: 2,
+    },
+    {
+        id: '2025143',
+        name: '25143 Itokawa',
+        nasa_jpl_url: 'https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=2025143',
+        absolute_magnitude_h: 19.2,
+        estimated_diameter_km_min: 0.33,
+        estimated_diameter_km_max: 0.33,
+        estimated_diameter_m_min: 330,
+        estimated_diameter_m_max: 330,
+        estimated_diameter_mi_min: 0.205,
+        estimated_diameter_mi_max: 0.205,
+        estimated_diameter_ft_min: 1083,
+        estimated_diameter_ft_max: 1083,
+        is_potentially_hazardous_asteroid: false,
+        is_sentry_object: false,
+        close_approach_date: '2028-02-11',
+        close_approach_date_full: '2028-Feb-11 19:45',
+        epoch_date_close_approach: 1833836700000,
+        relative_velocity_km_s: 12.8,
+        relative_velocity_km_h: 46080,
+        relative_velocity_mph: 28627.2,
+        miss_distance_au: 0.067,
+        miss_distance_lunar: 26.1,
+        miss_distance_km: 10024000,
+        miss_distance_mi: 6227904,
+        orbiting_body: 'Earth',
+        impact: {
+            energy_megatons: 65,
+            crater_km: 2.8,
+            risk_zones: ['North Atlantic'],
+        },
+        torino_scale: 0,
+        importance_score: 1,
+    },
+    {
+        id: '2003122',
+        name: '3122 Florence',
+        nasa_jpl_url: 'https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=2003122',
+        absolute_magnitude_h: 14.1,
+        estimated_diameter_km_min: 4.35,
+        estimated_diameter_km_max: 4.35,
+        estimated_diameter_m_min: 4350,
+        estimated_diameter_m_max: 4350,
+        estimated_diameter_mi_min: 2.70,
+        estimated_diameter_mi_max: 2.70,
+        estimated_diameter_ft_min: 14272,
+        estimated_diameter_ft_max: 14272,
+        is_potentially_hazardous_asteroid: true,
+        is_sentry_object: false,
+        close_approach_date: '2057-09-02',
+        close_approach_date_full: '2057-Sep-02 05:06',
+        epoch_date_close_approach: 2765478360000,
+        relative_velocity_km_s: 14.0,
+        relative_velocity_km_h: 50400,
+        relative_velocity_mph: 31317.6,
+        miss_distance_au: 0.047,
+        miss_distance_lunar: 18.3,
+        miss_distance_km: 7033000,
+        miss_distance_mi: 4370531,
+        orbiting_body: 'Earth',
+        impact: {
+            energy_megatons: 6800,
+            crater_km: 32,
+            risk_zones: ['Central Pacific', 'Hawaiian Islands'],
+        },
+        torino_scale: 0,
+        importance_score: 4,
+    },
+    {
+        id: '2054509',
+        name: '54509 YORP',
+        nasa_jpl_url: 'https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=2054509',
+        absolute_magnitude_h: 22.9,
+        estimated_diameter_km_min: 0.126,
+        estimated_diameter_km_max: 0.126,
+        estimated_diameter_m_min: 126,
+        estimated_diameter_m_max: 126,
+        estimated_diameter_mi_min: 0.078,
+        estimated_diameter_mi_max: 0.078,
+        estimated_diameter_ft_min: 413,
+        estimated_diameter_ft_max: 413,
+        is_potentially_hazardous_asteroid: false,
+        is_sentry_object: false,
+        close_approach_date: '2033-03-22',
+        close_approach_date_full: '2033-Mar-22 16:33',
+        epoch_date_close_approach: 1994540780000,
+        relative_velocity_km_s: 9.4,
+        relative_velocity_km_h: 33840,
+        relative_velocity_mph: 21025.4,
+        miss_distance_au: 0.078,
+        miss_distance_lunar: 30.3,
+        miss_distance_km: 11669000,
+        miss_distance_mi: 7249869,
+        orbiting_body: 'Earth',
+        impact: {
+            energy_megatons: 8,
+            crater_km: 1.2,
+            risk_zones: ['Remote Ocean'],
+        },
+        torino_scale: 0,
+        importance_score: 1,
+    },
+    {
+        id: '2001685',
+        name: '1685 Toro',
+        nasa_jpl_url: 'https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=2001685',
+        absolute_magnitude_h: 14.3,
+        estimated_diameter_km_min: 3.4,
+        estimated_diameter_km_max: 5.2,
+        estimated_diameter_m_min: 3400,
+        estimated_diameter_m_max: 5200,
+        estimated_diameter_mi_min: 2.11,
+        estimated_diameter_mi_max: 3.23,
+        estimated_diameter_ft_min: 11155,
+        estimated_diameter_ft_max: 17060,
+        is_potentially_hazardous_asteroid: true,
+        is_sentry_object: false,
+        close_approach_date: '2096-10-07',
+        close_approach_date_full: '2096-Oct-07 22:14',
+        epoch_date_close_approach: 4003027640000,
+        relative_velocity_km_s: 17.3,
+        relative_velocity_km_h: 62280,
+        relative_velocity_mph: 38695.2,
+        miss_distance_au: 0.041,
+        miss_distance_lunar: 15.9,
+        miss_distance_km: 6137000,
+        miss_distance_mi: 3813343,
+        orbiting_body: 'Earth',
+        impact: {
+            energy_megatons: 4200,
+            crater_km: 28,
+            risk_zones: ['South Atlantic', 'Brazilian Coast'],
+        },
+        torino_scale: 0,
+        importance_score: 4,
+    },
+    {
+        id: '2004197',
+        name: '4197 Morpheus',
+        nasa_jpl_url: 'https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=2004197',
+        absolute_magnitude_h: 19.8,
+        estimated_diameter_km_min: 0.92,
+        estimated_diameter_km_max: 0.92,
+        estimated_diameter_m_min: 920,
+        estimated_diameter_m_max: 920,
+        estimated_diameter_mi_min: 0.57,
+        estimated_diameter_mi_max: 0.57,
+        estimated_diameter_ft_min: 3018,
+        estimated_diameter_ft_max: 3018,
+        is_potentially_hazardous_asteroid: true,
+        is_sentry_object: true,
+        close_approach_date: '2126-08-11',
+        close_approach_date_full: '2126-Aug-11 07:28',
+        epoch_date_close_approach: 4948097280000,
+        relative_velocity_km_s: 9.8,
+        relative_velocity_km_h: 35280,
+        relative_velocity_mph: 21920.8,
+        miss_distance_au: 0.019,
+        miss_distance_lunar: 7.4,
+        miss_distance_km: 2843000,
+        miss_distance_mi: 1766763,
+        orbiting_body: 'Earth',
+        impact: {
+            energy_megatons: 1400,
+            crater_km: 16,
+            risk_zones: ['Northern Pacific', 'Alaska'],
+        },
+        torino_scale: 3,
+        importance_score: 8,
+    },
+    {
+        id: '2001981',
+        name: '1981 Midas',
+        nasa_jpl_url: 'https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=2001981',
+        absolute_magnitude_h: 15.5,
+        estimated_diameter_km_min: 2.0,
+        estimated_diameter_km_max: 2.0,
+        estimated_diameter_m_min: 2000,
+        estimated_diameter_m_max: 2000,
+        estimated_diameter_mi_min: 1.24,
+        estimated_diameter_mi_max: 1.24,
+        estimated_diameter_ft_min: 6562,
+        estimated_diameter_ft_max: 6562,
+        is_potentially_hazardous_asteroid: true,
+        is_sentry_object: false,
+        close_approach_date: '2085-03-15',
+        close_approach_date_full: '2085-Mar-15 13:42',
+        epoch_date_close_approach: 3635546520000,
+        relative_velocity_km_s: 26.5,
+        relative_velocity_km_h: 95400,
+        relative_velocity_mph: 59289.0,
+        miss_distance_au: 0.063,
+        miss_distance_lunar: 24.5,
+        miss_distance_km: 9426000,
+        miss_distance_mi: 5856146,
+        orbiting_body: 'Earth',
+        impact: {
+            energy_megatons: 2800,
+            crater_km: 22,
+            risk_zones: ['Red Sea', 'Middle East'],
+        },
+        torino_scale: 0,
+        importance_score: 4,
+    },
+    {
+        id: '2002100',
+        name: '2100 Ra-Shalom',
+        nasa_jpl_url: 'https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=2002100',
+        absolute_magnitude_h: 16.3,
+        estimated_diameter_km_min: 2.5,
+        estimated_diameter_km_max: 2.5,
+        estimated_diameter_m_min: 2500,
+        estimated_diameter_m_max: 2500,
+        estimated_diameter_mi_min: 1.55,
+        estimated_diameter_mi_max: 1.55,
+        estimated_diameter_ft_min: 8202,
+        estimated_diameter_ft_max: 8202,
+        is_potentially_hazardous_asteroid: false,
+        is_sentry_object: false,
+        close_approach_date: '2034-09-19',
+        close_approach_date_full: '2034-Sep-19 20:15',
+        epoch_date_close_approach: 2041327500000,
+        relative_velocity_km_s: 14.6,
+        relative_velocity_km_h: 52560,
+        relative_velocity_mph: 32659.6,
+        miss_distance_au: 0.092,
+        miss_distance_lunar: 35.8,
+        miss_distance_km: 13765000,
+        miss_distance_mi: 8551785,
+        orbiting_body: 'Earth',
+        impact: {
+            energy_megatons: 1200,
+            crater_km: 15,
+            risk_zones: ['Arctic Ocean'],
+        },
+        torino_scale: 0,
+        importance_score: 2,
+    },
+    {
+        id: '2001862',
+        name: '1862 Apollo',
+        nasa_jpl_url: 'https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=2001862',
+        absolute_magnitude_h: 16.25,
+        estimated_diameter_km_min: 1.5,
+        estimated_diameter_km_max: 1.5,
+        estimated_diameter_m_min: 1500,
+        estimated_diameter_m_max: 1500,
+        estimated_diameter_mi_min: 0.93,
+        estimated_diameter_mi_max: 0.93,
+        estimated_diameter_ft_min: 4921,
+        estimated_diameter_ft_max: 4921,
+        is_potentially_hazardous_asteroid: true,
+        is_sentry_object: false,
+        close_approach_date: '2039-11-07',
+        close_approach_date_full: '2039-Nov-07 11:33',
+        epoch_date_close_approach: 2204717580000,
+        relative_velocity_km_s: 21.8,
+        relative_velocity_km_h: 78480,
+        relative_velocity_mph: 48766.8,
+        miss_distance_au: 0.029,
+        miss_distance_lunar: 11.3,
+        miss_distance_km: 4340000,
+        miss_distance_mi: 2696260,
+        orbiting_body: 'Earth',
+        impact: {
+            energy_megatons: 1600,
+            crater_km: 18,
+            risk_zones: ['Eastern Pacific', 'South America West Coast'],
+        },
+        torino_scale: 0,
+        importance_score: 5,
+    },
+    {
+        id: '2001627',
+        name: '1627 Ivar',
+        nasa_jpl_url: 'https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=2001627',
+        absolute_magnitude_h: 12.8,
+        estimated_diameter_km_min: 8.1,
+        estimated_diameter_km_max: 9.1,
+        estimated_diameter_m_min: 8100,
+        estimated_diameter_m_max: 9100,
+        estimated_diameter_mi_min: 5.03,
+        estimated_diameter_mi_max: 5.65,
+        estimated_diameter_ft_min: 26575,
+        estimated_diameter_ft_max: 29856,
+        is_potentially_hazardous_asteroid: false,
+        is_sentry_object: false,
+        close_approach_date: '2047-01-12',
+        close_approach_date_full: '2047-Jan-12 04:27',
+        epoch_date_close_approach: 2430286020000,
+        relative_velocity_km_s: 11.9,
+        relative_velocity_km_h: 42840,
+        relative_velocity_mph: 26626.4,
+        miss_distance_au: 0.123,
+        miss_distance_lunar: 47.9,
+        miss_distance_km: 18404000,
+        miss_distance_mi: 11434884,
+        orbiting_body: 'Earth',
+        impact: {
+            energy_megatons: 18000,
+            crater_km: 55,
+            risk_zones: ['Global Devastation'],
+        },
+        torino_scale: 0,
+        importance_score: 6,
+    },
+    {
+        id: '2003200',
+        name: '3200 Phaethon',
+        nasa_jpl_url: 'https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=2003200',
+        absolute_magnitude_h: 14.6,
+        estimated_diameter_km_min: 5.8,
+        estimated_diameter_km_max: 5.8,
+        estimated_diameter_m_min: 5800,
+        estimated_diameter_m_max: 5800,
+        estimated_diameter_mi_min: 3.60,
+        estimated_diameter_mi_max: 3.60,
+        estimated_diameter_ft_min: 19029,
+        estimated_diameter_ft_max: 19029,
+        is_potentially_hazardous_asteroid: true,
+        is_sentry_object: false,
+        close_approach_date: '2093-12-14',
+        close_approach_date_full: '2093-Dec-14 20:20',
+        epoch_date_close_approach: 3912890400000,
+        relative_velocity_km_s: 10.9,
+        relative_velocity_km_h: 39240,
+        relative_velocity_mph: 24384.6,
+        miss_distance_au: 0.019,
+        miss_distance_lunar: 7.4,
+        miss_distance_km: 2843000,
+        miss_distance_mi: 1766763,
+        orbiting_body: 'Earth',
+        impact: {
+            energy_megatons: 9500,
+            crater_km: 42,
+            risk_zones: ['Indian Ocean', 'Indonesia'],
+        },
+        torino_scale: 0,
+        importance_score: 6,
+    },
+    {
+        id: '2006489',
+        name: '6489 Golevka',
+        nasa_jpl_url: 'https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=2006489',
+        absolute_magnitude_h: 19.2,
+        estimated_diameter_km_min: 0.53,
+        estimated_diameter_km_max: 0.53,
+        estimated_diameter_m_min: 530,
+        estimated_diameter_m_max: 530,
+        estimated_diameter_mi_min: 0.33,
+        estimated_diameter_mi_max: 0.33,
+        estimated_diameter_ft_min: 1739,
+        estimated_diameter_ft_max: 1739,
+        is_potentially_hazardous_asteroid: false,
+        is_sentry_object: false,
+        close_approach_date: '2040-07-24',
+        close_approach_date_full: '2040-Jul-24 15:19',
+        epoch_date_close_approach: 2226485940000,
+        relative_velocity_km_s: 18.6,
+        relative_velocity_km_h: 66960,
+        relative_velocity_mph: 41606.4,
+        miss_distance_au: 0.071,
+        miss_distance_lunar: 27.6,
+        miss_distance_km: 10622000,
+        miss_distance_mi: 6599458,
+        orbiting_body: 'Earth',
+        impact: {
+            energy_megatons: 180,
+            crater_km: 5,
+            risk_zones: ['North Sea'],
+        },
+        torino_scale: 0,
+        importance_score: 2,
+    },
+    {
+        id: '2001915',
+        name: '1915 Quetzalcoatl',
+        nasa_jpl_url: 'https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=2001915',
+        absolute_magnitude_h: 18.4,
+        estimated_diameter_km_min: 0.82,
+        estimated_diameter_km_max: 0.82,
+        estimated_diameter_m_min: 820,
+        estimated_diameter_m_max: 820,
+        estimated_diameter_mi_min: 0.51,
+        estimated_diameter_mi_max: 0.51,
+        estimated_diameter_ft_min: 2690,
+        estimated_diameter_ft_max: 2690,
+        is_potentially_hazardous_asteroid: false,
+        is_sentry_object: false,
+        close_approach_date: '2036-05-09',
+        close_approach_date_full: '2036-May-09 08:42',
+        epoch_date_close_approach: 2094114120000,
+        relative_velocity_km_s: 13.7,
+        relative_velocity_km_h: 49320,
+        relative_velocity_mph: 30650.2,
+        miss_distance_au: 0.055,
+        miss_distance_lunar: 21.4,
+        miss_distance_km: 8233000,
+        miss_distance_mi: 5114913,
+        orbiting_body: 'Earth',
+        impact: {
+            energy_megatons: 280,
+            crater_km: 6.5,
+            risk_zones: ['Gulf of Mexico'],
+        },
+        torino_scale: 0,
+        importance_score: 2,
+    },
+    {
+        id: '2001866',
+        name: '1866 Sisyphus',
+        nasa_jpl_url: 'https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=2001866',
+        absolute_magnitude_h: 12.4,
+        estimated_diameter_km_min: 8.5,
+        estimated_diameter_km_max: 8.5,
+        estimated_diameter_m_min: 8500,
+        estimated_diameter_m_max: 8500,
+        estimated_diameter_mi_min: 5.28,
+        estimated_diameter_mi_max: 5.28,
+        estimated_diameter_ft_min: 27887,
+        estimated_diameter_ft_max: 27887,
+        is_potentially_hazardous_asteroid: false,
+        is_sentry_object: false,
+        close_approach_date: '2071-11-25',
+        close_approach_date_full: '2071-Nov-25 12:18',
+        epoch_date_close_approach: 3217940280000,
+        relative_velocity_km_s: 15.2,
+        relative_velocity_km_h: 54720,
+        relative_velocity_mph: 33998.4,
+        miss_distance_au: 0.187,
+        miss_distance_lunar: 72.7,
+        miss_distance_km: 27971000,
+        miss_distance_mi: 17384171,
+        orbiting_body: 'Earth',
+        impact: {
+            energy_megatons: 22000,
+            crater_km: 60,
+            risk_zones: ['Global Mass Extinction'],
+        },
+        torino_scale: 0,
+        importance_score: 7,
+    },
+    {
+        id: '2001580',
+        name: '1580 Betulia',
+        nasa_jpl_url: 'https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=2001580',
+        absolute_magnitude_h: 15.4,
+        estimated_diameter_km_min: 4.6,
+        estimated_diameter_km_max: 4.6,
+        estimated_diameter_m_min: 4600,
+        estimated_diameter_m_max: 4600,
+        estimated_diameter_mi_min: 2.86,
+        estimated_diameter_mi_max: 2.86,
+        estimated_diameter_ft_min: 15092,
+        estimated_diameter_ft_max: 15092,
+        is_potentially_hazardous_asteroid: false,
+        is_sentry_object: false,
+        close_approach_date: '2043-08-06',
+        close_approach_date_full: '2043-Aug-06 17:55',
+        epoch_date_close_approach: 2322851700000,
+        relative_velocity_km_s: 8.3,
+        relative_velocity_km_h: 29880,
+        relative_velocity_mph: 18566.4,
+        miss_distance_au: 0.098,
+        miss_distance_lunar: 38.1,
+        miss_distance_km: 14662000,
+        miss_distance_mi: 9109322,
+        orbiting_body: 'Earth',
+        impact: {
+            energy_megatons: 4800,
+            crater_km: 30,
+            risk_zones: ['Southern Ocean'],
+        },
+        torino_scale: 0,
+        importance_score: 3,
+    },
+    {
+        id: '2001943',
+        name: '1943 Anteros',
+        nasa_jpl_url: 'https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=2001943',
+        absolute_magnitude_h: 15.7,
+        estimated_diameter_km_min: 2.0,
+        estimated_diameter_km_max: 2.0,
+        estimated_diameter_m_min: 2000,
+        estimated_diameter_m_max: 2000,
+        estimated_diameter_mi_min: 1.24,
+        estimated_diameter_mi_max: 1.24,
+        estimated_diameter_ft_min: 6562,
+        estimated_diameter_ft_max: 6562,
+        is_potentially_hazardous_asteroid: false,
+        is_sentry_object: false,
+        close_approach_date: '2061-12-30',
+        close_approach_date_full: '2061-Dec-30 23:47',
+        epoch_date_close_approach: 2903814420000,
+        relative_velocity_km_s: 12.1,
+        relative_velocity_km_h: 43560,
+        relative_velocity_mph: 27073.6,
+        miss_distance_au: 0.084,
+        miss_distance_lunar: 32.7,
+        miss_distance_km: 12569000,
+        miss_distance_mi: 7808069,
+        orbiting_body: 'Earth',
+        impact: {
+            energy_megatons: 1100,
+            crater_km: 14,
+            risk_zones: ['Tasman Sea'],
+        },
+        torino_scale: 0,
+        importance_score: 3,
+    },
+    {
+        id: '2003362',
+        name: '3362 Khufu',
+        nasa_jpl_url: 'https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=2003362',
+        absolute_magnitude_h: 20.1,
+        estimated_diameter_km_min: 0.65,
+        estimated_diameter_km_max: 0.65,
+        estimated_diameter_m_min: 650,
+        estimated_diameter_m_max: 650,
+        estimated_diameter_mi_min: 0.40,
+        estimated_diameter_mi_max: 0.40,
+        estimated_diameter_ft_min: 2133,
+        estimated_diameter_ft_max: 2133,
+        is_potentially_hazardous_asteroid: true,
+        is_sentry_object: false,
+        close_approach_date: '2052-08-31',
+        close_approach_date_full: '2052-Aug-31 09:14',
+        epoch_date_close_approach: 2607930840000,
+        relative_velocity_km_s: 23.8,
+        relative_velocity_km_h: 85680,
+        relative_velocity_mph: 53246.8,
+        miss_distance_au: 0.036,
+        miss_distance_lunar: 14.0,
+        miss_distance_km: 5386000,
+        miss_distance_mi: 3346746,
+        orbiting_body: 'Earth',
+        impact: {
+            energy_megatons: 520,
+            crater_km: 9,
+            risk_zones: ['Black Sea', 'Eastern Europe'],
+        },
+        torino_scale: 0,
+        importance_score: 4,
+    },
+    {
+        id: '2001036_2',
+        name: '1036 Ganymed B',
+        nasa_jpl_url: 'https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=2001036',
+        absolute_magnitude_h: 18.2,
+        estimated_diameter_km_min: 0.95,
+        estimated_diameter_km_max: 1.1,
+        estimated_diameter_m_min: 950,
+        estimated_diameter_m_max: 1100,
+        estimated_diameter_mi_min: 0.59,
+        estimated_diameter_mi_max: 0.68,
+        estimated_diameter_ft_min: 3117,
+        estimated_diameter_ft_max: 3609,
+        is_potentially_hazardous_asteroid: true,
+        is_sentry_object: true,
+        close_approach_date: '2118-03-15',
+        close_approach_date_full: '2118-Mar-15 11:30',
+        epoch_date_close_approach: 4679785800000,
+        relative_velocity_km_s: 8.7,
+        relative_velocity_km_h: 31320,
+        relative_velocity_mph: 19462.2,
+        miss_distance_au: 0.012,
+        miss_distance_lunar: 4.7,
+        miss_distance_km: 1796000,
+        miss_distance_mi: 1115684,
+        orbiting_body: 'Earth',
+        impact: {
+            energy_megatons: 2200,
+            crater_km: 20,
+            risk_zones: ['Western Pacific', 'Japan', 'Korea'],
+        },
+        torino_scale: 4,
+        importance_score: 9,
+    },
+    {
+        id: '2002101',
+        name: '2101 Adonis',
+        nasa_jpl_url: 'https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=2002101',
+        absolute_magnitude_h: 18.8,
+        estimated_diameter_km_min: 1.5,
+        estimated_diameter_km_max: 1.5,
+        estimated_diameter_m_min: 1500,
+        estimated_diameter_m_max: 1500,
+        estimated_diameter_mi_min: 0.93,
+        estimated_diameter_mi_max: 0.93,
+        estimated_diameter_ft_min: 4921,
+        estimated_diameter_ft_max: 4921,
+        is_potentially_hazardous_asteroid: true,
+        is_sentry_object: false,
+        close_approach_date: '2036-02-07',
+        close_approach_date_full: '2036-Feb-07 14:22',
+        epoch_date_close_approach: 2087146920000,
+        relative_velocity_km_s: 25.4,
+        relative_velocity_km_h: 91440,
+        relative_velocity_mph: 56830.4,
+        miss_distance_au: 0.015,
+        miss_distance_lunar: 5.8,
+        miss_distance_km: 2245000,
+        miss_distance_mi: 1394595,
+        orbiting_body: 'Earth',
+        impact: {
+            energy_megatons: 3200,
+            crater_km: 25,
+            risk_zones: ['Central Atlantic', 'Western Africa'],
+        },
+        torino_scale: 1,
+        importance_score: 7,
+    },
+    {
+        id: '2004660',
+        name: '4660 Nereus',
+        nasa_jpl_url: 'https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=2004660',
+        absolute_magnitude_h: 17.6,
+        estimated_diameter_km_min: 0.33,
+        estimated_diameter_km_max: 0.33,
+        estimated_diameter_m_min: 330,
+        estimated_diameter_m_max: 330,
+        estimated_diameter_mi_min: 0.205,
+        estimated_diameter_mi_max: 0.205,
+        estimated_diameter_ft_min: 1083,
+        estimated_diameter_ft_max: 1083,
+        is_potentially_hazardous_asteroid: false,
+        is_sentry_object: false,
+        close_approach_date: '2029-02-14',
+        close_approach_date_full: '2029-Feb-14 06:10',
+        epoch_date_close_approach: 1865583000000,
+        relative_velocity_km_s: 3.9,
+        relative_velocity_km_h: 14040,
+        relative_velocity_mph: 8724.9,
+        miss_distance_au: 0.012,
+        miss_distance_lunar: 4.7,
+        miss_distance_km: 1796000,
+        miss_distance_mi: 1115684,
+        orbiting_body: 'Earth',
+        impact: {
+            energy_megatons: 45,
+            crater_km: 2.2,
+            risk_zones: ['Baltic Sea'],
+        },
+        torino_scale: 0,
+        importance_score: 2,
+    },
+    {
+        id: '2000216',
+        name: '216 Kleopatra',
+        nasa_jpl_url: 'https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=2000216',
+        absolute_magnitude_h: 7.3,
+        estimated_diameter_km_min: 124.0,
+        estimated_diameter_km_max: 124.0,
+        estimated_diameter_m_min: 124000,
+        estimated_diameter_m_max: 124000,
+        estimated_diameter_mi_min: 77.05,
+        estimated_diameter_mi_max: 77.05,
+        estimated_diameter_ft_min: 406824,
+        estimated_diameter_ft_max: 406824,
+        is_potentially_hazardous_asteroid: false,
+        is_sentry_object: false,
+        close_approach_date: '2176-09-12',
+        close_approach_date_full: '2176-Sep-12 03:47',
+        epoch_date_close_approach: 6527394420000,
+        relative_velocity_km_s: 18.2,
+        relative_velocity_km_h: 65520,
+        relative_velocity_mph: 40711.2,
+        miss_distance_au: 0.423,
+        miss_distance_lunar: 164.5,
+        miss_distance_km: 63279000,
+        miss_distance_mi: 39308979,
+        orbiting_body: 'Earth',
+        impact: {
+            energy_megatons: 750000000,
+            crater_km: 800,
+            risk_zones: ['Global Extinction Event'],
+        },
+        torino_scale: 0,
+        importance_score: 8,
+    },
+    {
+        id: '2065803',
+        name: '65803 Didymos',
+        nasa_jpl_url: 'https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=2065803',
+        absolute_magnitude_h: 18.16,
+        estimated_diameter_km_min: 0.78,
+        estimated_diameter_km_max: 0.78,
+        estimated_diameter_m_min: 780,
+        estimated_diameter_m_max: 780,
+        estimated_diameter_mi_min: 0.48,
+        estimated_diameter_mi_max: 0.48,
+        estimated_diameter_ft_min: 2559,
+        estimated_diameter_ft_max: 2559,
+        is_potentially_hazardous_asteroid: true,
+        is_sentry_object: false,
+        close_approach_date: '2123-09-30',
+        close_approach_date_full: '2123-Sep-30 12:18',
+        epoch_date_close_approach: 4857031080000,
+        relative_velocity_km_s: 4.14,
+        relative_velocity_km_h: 14904,
+        relative_velocity_mph: 9261.5,
+        miss_distance_au: 0.038,
+        miss_distance_lunar: 14.8,
+        miss_distance_km: 5684000,
+        miss_distance_mi: 3531996,
+        orbiting_body: 'Earth',
+        impact: {
+            energy_megatons: 380,
+            crater_km: 7.5,
+            risk_zones: ['Bering Sea'],
+        },
+        torino_scale: 0,
+        importance_score: 4,
+    },
 ].sort((a, b) => b.importance_score - a.importance_score);
 
-// Function to create space background with stars
+
 function createStarField() {
     const starsGeometry = new THREE.BufferGeometry();
     const starCount = 15000;
-
     const positions = new Float32Array(starCount * 3);
     const colors = new Float32Array(starCount * 3);
 
@@ -306,16 +1221,13 @@ function createStarField() {
     return new THREE.Points(starsGeometry, starsMaterial);
 }
 
-// Enhanced Earth creation with detailed textures
 function createDetailedEarth() {
     const earthGeometry = new THREE.SphereGeometry(6, 128, 128);
-    
     const earthCanvas = document.createElement('canvas');
     earthCanvas.width = 1024;
     earthCanvas.height = 512;
     const earthContext = earthCanvas.getContext('2d')!;
     
-    // Ocean base
     const oceanGradient = earthContext.createLinearGradient(0, 0, 0, 512);
     oceanGradient.addColorStop(0, '#1a5490');
     oceanGradient.addColorStop(0.5, '#2563eb');
@@ -323,7 +1235,6 @@ function createDetailedEarth() {
     earthContext.fillStyle = oceanGradient;
     earthContext.fillRect(0, 0, 1024, 512);
     
-    // Add depth variation
     for (let i = 0; i < 50; i++) {
         const x = Math.random() * 1024;
         const y = Math.random() * 512;
@@ -339,41 +1250,33 @@ function createDetailedEarth() {
         earthContext.fill();
     }
     
-    // Detailed continent shapes
     const continentColors = ['#228b22', '#32cd32', '#90ee90', '#006400'];
     
-    // North America
     earthContext.fillStyle = continentColors[0];
     earthContext.fillRect(80, 60, 120, 90);
     earthContext.fillRect(60, 80, 80, 70);
     earthContext.fillRect(100, 140, 60, 40);
     
-    // South America  
     earthContext.fillStyle = continentColors[1];
     earthContext.fillRect(140, 180, 60, 120);
     earthContext.fillRect(120, 220, 40, 100);
     
-    // Europe
     earthContext.fillStyle = continentColors[2];
     earthContext.fillRect(400, 80, 80, 60);
     earthContext.fillRect(420, 70, 60, 40);
     
-    // Africa
     earthContext.fillStyle = continentColors[0];
     earthContext.fillRect(420, 140, 100, 160);
     earthContext.fillRect(440, 160, 80, 120);
     
-    // Asia
     earthContext.fillStyle = continentColors[3];
     earthContext.fillRect(500, 80, 200, 120);
     earthContext.fillRect(520, 120, 160, 80);
     earthContext.fillRect(600, 60, 100, 60);
     
-    // Australia
     earthContext.fillStyle = continentColors[1];
     earthContext.fillRect(700, 240, 80, 40);
     
-    // Add mountain ranges
     earthContext.fillStyle = '#8b4513';
     for (let i = 0; i < 30; i++) {
         const x = Math.random() * 1024;
@@ -381,7 +1284,6 @@ function createDetailedEarth() {
         earthContext.fillRect(x, y, Math.random() * 20 + 5, Math.random() * 10 + 2);
     }
     
-    // Add islands
     earthContext.fillStyle = continentColors[2];
     for (let i = 0; i < 100; i++) {
         const x = Math.random() * 1024;
@@ -394,7 +1296,6 @@ function createDetailedEarth() {
 
     const earthTexture = new THREE.CanvasTexture(earthCanvas);
     
-    // Create bump map
     const bumpCanvas = document.createElement('canvas');
     bumpCanvas.width = 512;
     bumpCanvas.height = 256;
@@ -409,7 +1310,6 @@ function createDetailedEarth() {
     }
     
     const bumpTexture = new THREE.CanvasTexture(bumpCanvas);
-
     const earthMaterial = new THREE.MeshPhongMaterial({
         map: earthTexture,
         bumpMap: bumpTexture,
@@ -421,11 +1321,8 @@ function createDetailedEarth() {
     return new THREE.Mesh(earthGeometry, earthMaterial);
 }
 
-// Create detailed asteroid with procedural surface
 function createDetailedAsteroid(size: number, color: number) {
     const geometry = new THREE.IcosahedronGeometry(size, 2);
-    
-    // Deform vertices for irregular shape
     const positionAttribute = geometry.getAttribute('position');
     const positions = positionAttribute.array as Float32Array;
     
@@ -441,7 +1338,6 @@ function createDetailedAsteroid(size: number, color: number) {
     positionAttribute.needsUpdate = true;
     geometry.computeVertexNormals();
 
-    // Create detailed surface texture
     const canvas = document.createElement('canvas');
     canvas.width = 256;
     canvas.height = 256;
@@ -451,7 +1347,6 @@ function createDetailedAsteroid(size: number, color: number) {
     context.fillStyle = `rgb(${Math.floor(baseColor.r * 255)}, ${Math.floor(baseColor.g * 255)}, ${Math.floor(baseColor.b * 255)})`;
     context.fillRect(0, 0, 256, 256);
     
-    // Add craters
     for (let i = 0; i < 50; i++) {
         const x = Math.random() * 256;
         const y = Math.random() * 256;
@@ -467,7 +1362,6 @@ function createDetailedAsteroid(size: number, color: number) {
         context.fill();
     }
     
-    // Add surface roughness
     for (let i = 0; i < 200; i++) {
         const brightness = Math.random() * 100 - 50;
         context.fillStyle = `rgba(${brightness + 128}, ${brightness + 128}, ${brightness + 128}, 0.3)`;
@@ -475,7 +1369,6 @@ function createDetailedAsteroid(size: number, color: number) {
     }
 
     const texture = new THREE.CanvasTexture(canvas);
-
     const material = new THREE.MeshPhongMaterial({
         map: texture,
         color: color,
@@ -487,11 +1380,8 @@ function createDetailedAsteroid(size: number, color: number) {
     return new THREE.Mesh(geometry, material);
 }
 
-// Create impact trajectory line from asteroid to impact zone
 function createImpactTrajectory(asteroidPosition: THREE.Vector3, riskZones: string[]): THREE.Group {
     const trajectoryGroup = new THREE.Group();
-    
-    // Zone coordinates
     const zoneCoordinates: { [key: string]: { lat: number; lng: number } } = {
         'Pacific Ocean': { lat: 0, lng: -150 },
         'Coastal Japan': { lat: 36, lng: 138 },
@@ -503,28 +1393,61 @@ function createImpactTrajectory(asteroidPosition: THREE.Vector3, riskZones: stri
         'Global Impact': { lat: 0, lng: 0 },
         'Mass Extinction Event': { lat: 0, lng: 0 },
         'Continental Devastation': { lat: 40, lng: -100 },
-        'Regional Damage': { lat: 35, lng: 25 }
+        'Regional Damage': { lat: 35, lng: 25 },
+        'Mediterranean Sea': { lat: 35, lng: 18 },
+        'Southern Europe': { lat: 45, lng: 15 },
+        'South China Sea': { lat: 15, lng: 115 },
+        'Philippines': { lat: 12, lng: 122 },
+        'Arabian Sea': { lat: 18, lng: 65 },
+        'Western India': { lat: 20, lng: 75 },
+        'Bay of Bengal': { lat: 15, lng: 90 },
+        'Caribbean Sea': { lat: 15, lng: -75 },
+        'North Atlantic': { lat: 45, lng: -30 },
+        'Central Pacific': { lat: 5, lng: -160 },
+        'Hawaiian Islands': { lat: 21, lng: -157 },
+        'Remote Ocean': { lat: -30, lng: 150 },
+        'Northern Pacific': { lat: 50, lng: -160 },
+        'Alaska': { lat: 64, lng: -153 },
+        'South Atlantic': { lat: -30, lng: -15 },
+        'Brazilian Coast': { lat: -15, lng: -45 },
+        'Arctic Ocean': { lat: 80, lng: 0 },
+        'Red Sea': { lat: 20, lng: 38 },
+        'Middle East': { lat: 28, lng: 47 },
+        'Eastern Pacific': { lat: -10, lng: -120 },
+        'South America West Coast': { lat: -20, lng: -75 },
+        'Global Devastation': { lat: 0, lng: 0 },
+        'Indonesia': { lat: -2, lng: 118 },
+        'North Sea': { lat: 56, lng: 3 },
+        'Gulf of Mexico': { lat: 25, lng: -90 },
+        'Southern Ocean': { lat: -50, lng: 0 },
+        'Tasman Sea': { lat: -35, lng: 160 },
+        'Black Sea': { lat: 43, lng: 35 },
+        'Eastern Europe': { lat: 50, lng: 30 },
+        'Western Pacific': { lat: 25, lng: 140 },
+        'Japan': { lat: 36, lng: 138 },
+        'Korea': { lat: 37, lng: 127 },
+        'Central Atlantic': { lat: 10, lng: -25 },
+        'Western Africa': { lat: 10, lng: -10 },
+        'Baltic Sea': { lat: 58, lng: 20 },
+        'Global Extinction Event': { lat: 0, lng: 0 },
+        'Bering Sea': { lat: 58, lng: -175 },
+        'North America': { lat: 45, lng: -100 },
+        'Canada': { lat: 60, lng: -110 }
     };
 
     riskZones.forEach(zone => {
         const coords = zoneCoordinates[zone];
         if (coords) {
-            // Convert lat/lng to 3D coordinates on Earth surface
             const phi = (90 - coords.lat) * (Math.PI / 180);
             const theta = (coords.lng + 180) * (Math.PI / 180);
-            
             const radius = 6.1;
             const impactX = -(radius * Math.sin(phi) * Math.cos(theta));
             const impactZ = (radius * Math.sin(phi) * Math.sin(theta));
             const impactY = (radius * Math.cos(phi));
-            
             const impactPoint = new THREE.Vector3(impactX, impactY, impactZ);
             
-            // Create trajectory line from asteroid to impact point
             const trajectoryPoints = [];
             trajectoryPoints.push(asteroidPosition.clone());
-            
-            // Add intermediate points for curved trajectory
             const midPoint = new THREE.Vector3().lerpVectors(asteroidPosition, impactPoint, 0.5);
             midPoint.y += 3;
             trajectoryPoints.push(midPoint);
@@ -533,7 +1456,6 @@ function createImpactTrajectory(asteroidPosition: THREE.Vector3, riskZones: stri
             const trajectoryGeometry = new THREE.CatmullRomCurve3(trajectoryPoints);
             const points = trajectoryGeometry.getPoints(50);
             const lineGeometry = new THREE.BufferGeometry().setFromPoints(points);
-            
             const lineMaterial = new THREE.LineBasicMaterial({
                 color: 0xff0000,
                 transparent: true,
@@ -544,7 +1466,6 @@ function createImpactTrajectory(asteroidPosition: THREE.Vector3, riskZones: stri
             const trajectoryLine = new THREE.Line(lineGeometry, lineMaterial);
             trajectoryGroup.add(trajectoryLine);
             
-            // Add impact marker - FIXED: Remove emissive from MeshBasicMaterial
             const impactGeometry = new THREE.SphereGeometry(0.8, 16, 16);
             const impactMaterial = new THREE.MeshBasicMaterial({
                 color: 0xff0000,
@@ -556,7 +1477,6 @@ function createImpactTrajectory(asteroidPosition: THREE.Vector3, riskZones: stri
             impactMarker.position.copy(impactPoint);
             trajectoryGroup.add(impactMarker);
             
-            // Add pulsing ring
             const pulseGeometry = new THREE.RingGeometry(1.2, 2.0, 32);
             const pulseMaterial = new THREE.MeshBasicMaterial({
                 color: 0xff0000,
@@ -575,15 +1495,15 @@ function createImpactTrajectory(asteroidPosition: THREE.Vector3, riskZones: stri
     return trajectoryGroup;
 }
 
-export default function App(): React.JSX.Element {
+export default function App(): JSX.Element {
     const mountRef = useRef<HTMLDivElement | null>(null);
     const [selectedAsteroid, setSelectedAsteroid] = useState<AsteroidData | null>(null);
     const [hoveredAsteroid, setHoveredAsteroid] = useState<AsteroidData | null>(null);
     const [showOrbits, setShowOrbits] = useState<boolean>(true);
     const [maxAsteroids, setMaxAsteroids] = useState<number>(ASTEROID_DATA.length);
     const [cameraDistance, setCameraDistance] = useState<number>(35);
+    const [isGeneratingReport, setIsGeneratingReport] = useState<boolean>(false);
     
-    // Refs to persist through re-renders without causing zoom issues - ZOOM WORKING PERFECTLY
     const asteroidMeshes = useRef<Record<string, AsteroidMesh>>({});
     const currentImpactTrajectory = useRef<THREE.Group | null>(null);
     const sceneRef = useRef<THREE.Scene | null>(null);
@@ -595,25 +1515,87 @@ export default function App(): React.JSX.Element {
     const isInitialized = useRef<boolean>(false);
     const selectedAsteroidRef = useRef<AsteroidData | null>(null);
     
-    // FIXED: Sync selectedAsteroidRef with selectedAsteroid state
     useEffect(() => {
         selectedAsteroidRef.current = selectedAsteroid;
     }, [selectedAsteroid]);
     
-    // Fixed animation speed - no slider needed since we have pause/resume
     const animationSpeed = 1.0;
-
     const visibleAsteroids = useMemo(() => {
         return ASTEROID_DATA.slice(0, maxAsteroids);
     }, [maxAsteroids]);
 
-    // Function to recreate asteroids when maxAsteroids changes
+    // Multi-asteroid report function (for main menu)
+    const generateAIReport = async () => {
+        setIsGeneratingReport(true);
+        try {
+            const asteroidIds = visibleAsteroids.map(asteroid => asteroid.id);
+            const response = await fetch('/reports', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    asteroidIds: asteroidIds,
+                    requestedAt: new Date().toISOString(),
+                    totalAsteroids: asteroidIds.length
+                })
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                console.log('AI Report generated:', result);
+                alert(`✅ AI Report generated successfully! Report ID: ${result.reportId || 'Generated'}`);
+            } else {
+                console.error('Failed to generate report:', response.statusText);
+                alert('❌ Failed to generate AI report. Please try again.');
+            }
+        } catch (error) {
+            console.error('Error generating report:', error);
+            alert('❌ Network error while generating AI report. Please check your connection.');
+        } finally {
+            setIsGeneratingReport(false);
+        }
+    };
+
+    // Single asteroid report function (for selected asteroid)
+    const generateSingleAsteroidReport = async () => {
+        if (!selectedAsteroid) return;
+        
+        setIsGeneratingReport(true);
+        try {
+            const response = await fetch('/reports', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    asteroidIds: [selectedAsteroid.id],
+                    requestedAt: new Date().toISOString(),
+                    totalAsteroids: 1
+                })
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                console.log('Single Asteroid Report generated:', result);
+                alert(`✅ Report for ${selectedAsteroid.name} generated successfully! Report ID: ${result.reportId || 'Generated'}`);
+            } else {
+                console.error('Failed to generate single asteroid report:', response.statusText);
+                alert('❌ Failed to generate asteroid report. Please try again.');
+            }
+        } catch (error) {
+            console.error('Error generating single asteroid report:', error);
+            alert('❌ Network error while generating asteroid report. Please check your connection.');
+        } finally {
+            setIsGeneratingReport(false);
+        }
+    };
+
+    // DYNAMIC RING CREATION SYSTEM - Creates as many rings as needed
     const recreateAsteroids = () => {
         if (!sceneRef.current) return;
-
         const scene = sceneRef.current;
 
-        // Clear existing asteroids
         Object.values(asteroidMeshes.current).forEach((mesh) => {
             scene.remove(mesh);
             mesh.geometry.dispose();
@@ -623,29 +1605,97 @@ export default function App(): React.JSX.Element {
         });
         asteroidMeshes.current = {};
 
-        // Create orbital ring distances
-        const orbitDistances = [15, 25, 40];
-
-        // Create asteroids with proper orbital motion
-        visibleAsteroids.forEach((asteroid) => {
-            // Assign to orbital rings
-            let orbitRing: number;
-            let distance: number;
+        // DYNAMIC RING SYSTEM - Creates as many rings as needed
+        const calculateDynamicRings = () => {
+            const maxAsteroidsPerRing = 5; // Max asteroids per ring before creating new ring
+            const baseDistance = 15; // Starting distance for first ring
+            const ringGap = 12; // INCREASED gap between rings for better spacing
             
-            if (asteroid.is_sentry_object || asteroid.torino_scale >= 3) {
-                orbitRing = 0;
-                distance = orbitDistances[0];
-            } else if (asteroid.is_potentially_hazardous_asteroid || asteroid.torino_scale >= 1) {
-                orbitRing = 1;
-                distance = orbitDistances[1];
-            } else {
-                orbitRing = 2;
-                distance = orbitDistances[2];
+            // Categorize asteroids by priority
+            const criticalAsteroids = visibleAsteroids.filter(a => a.is_sentry_object || a.torino_scale >= 3);
+            const hazardousAsteroids = visibleAsteroids.filter(a => !criticalAsteroids.includes(a) && (a.is_potentially_hazardous_asteroid || a.torino_scale >= 1));
+            const regularAsteroids = visibleAsteroids.filter(a => !criticalAsteroids.includes(a) && !hazardousAsteroids.includes(a));
+            
+            // Calculate how many rings we need for each category
+            const criticalRings = Math.max(1, Math.ceil(criticalAsteroids.length / maxAsteroidsPerRing));
+            const hazardousRings = Math.max(0, Math.ceil(hazardousAsteroids.length / maxAsteroidsPerRing));
+            const regularRings = Math.max(0, Math.ceil(regularAsteroids.length / maxAsteroidsPerRing));
+            
+            // Create ring configuration
+            const rings = [];
+            let currentDistance = baseDistance;
+            
+            // Critical rings (innermost)
+            for (let i = 0; i < criticalRings; i++) {
+                rings.push({
+                    distance: currentDistance,
+                    type: 'critical',
+                    color: 0xff4444,
+                    opacity: 0.2
+                });
+                currentDistance += ringGap;
             }
             
-            distance += (Math.random() - 0.5) * 4;
+            // Hazardous rings (middle)
+            for (let i = 0; i < hazardousRings; i++) {
+                rings.push({
+                    distance: currentDistance,
+                    type: 'hazardous', 
+                    color: 0xff8844,
+                    opacity: 0.15
+                });
+                currentDistance += ringGap;
+            }
+            
+            // Regular rings (outermost)
+            for (let i = 0; i < regularRings; i++) {
+                rings.push({
+                    distance: currentDistance,
+                    type: 'regular',
+                    color: 0x888888,
+                    opacity: 0.1
+                });
+                currentDistance += ringGap;
+            }
+            
+            return { rings, criticalAsteroids, hazardousAsteroids, regularAsteroids, maxAsteroidsPerRing };
+        };
 
-            // MUCH BIGGER ASTEROIDS - All clearly visible
+        const { rings, criticalAsteroids, hazardousAsteroids, regularAsteroids, maxAsteroidsPerRing } = calculateDynamicRings();
+        
+        // Distribute asteroids across rings
+        let hazardousRingIndex = criticalAsteroids.length > 0 ? Math.ceil(criticalAsteroids.length / maxAsteroidsPerRing) : 0;
+        let regularRingIndex = hazardousRingIndex + (hazardousAsteroids.length > 0 ? Math.ceil(hazardousAsteroids.length / maxAsteroidsPerRing) : 0);
+        
+        visibleAsteroids.forEach((asteroid, index) => {
+            let ringIndex, ringType, asteroidList, localIndex;
+            
+            // Determine which ring this asteroid belongs to
+            if (criticalAsteroids.includes(asteroid)) {
+                ringIndex = Math.floor(criticalAsteroids.indexOf(asteroid) / maxAsteroidsPerRing);
+                ringType = 'critical';
+                asteroidList = criticalAsteroids;
+                localIndex = criticalAsteroids.indexOf(asteroid);
+            } else if (hazardousAsteroids.includes(asteroid)) {
+                ringIndex = hazardousRingIndex + Math.floor(hazardousAsteroids.indexOf(asteroid) / maxAsteroidsPerRing);
+                ringType = 'hazardous';
+                asteroidList = hazardousAsteroids;
+                localIndex = hazardousAsteroids.indexOf(asteroid);
+            } else {
+                ringIndex = regularRingIndex + Math.floor(regularAsteroids.indexOf(asteroid) / maxAsteroidsPerRing);
+                ringType = 'regular';
+                asteroidList = regularAsteroids;
+                localIndex = regularAsteroids.indexOf(asteroid);
+            }
+            
+            const ring = rings[ringIndex];
+            if (!ring) return; // Safety check
+            
+            let distance = ring.distance;
+            // SLIGHTLY INCREASED random variation for better spacing
+            distance += (Math.random() - 0.5) * 3;
+
+            // ENHANCED SIZE CALCULATION
             let size;
             const diameterKm = asteroid.estimated_diameter_km_max;
 
@@ -659,20 +1709,23 @@ export default function App(): React.JSX.Element {
                 size = Math.max(diameterKm * 1.0, 0.8);
             }
             
-            // Initial position for orbital motion
-            const asteroidsInRing = visibleAsteroids.filter((_, i) => {
-                const tempRing = ASTEROID_DATA[i]?.is_sentry_object || ASTEROID_DATA[i]?.torino_scale >= 3 ? 0 :
-                                ASTEROID_DATA[i]?.is_potentially_hazardous_asteroid || ASTEROID_DATA[i]?.torino_scale >= 1 ? 1 : 2;
-                return tempRing === orbitRing;
-            });
-            const ringIndex = asteroidsInRing.findIndex(a => a.id === asteroid.id);
-            const initialAngle = (ringIndex / asteroidsInRing.length) * Math.PI * 2;
+            // OPTIMAL POSITIONING within ring - max 5 per ring
+            const asteroidIndexInRing = localIndex % maxAsteroidsPerRing;
+            const totalInThisRing = Math.min(maxAsteroidsPerRing, asteroidList.length - Math.floor(localIndex / maxAsteroidsPerRing) * maxAsteroidsPerRing);
+            
+            let initialAngle;
+            if (totalInThisRing === 1) {
+                initialAngle = 0;
+            } else {
+                // Evenly distribute around the ring
+                initialAngle = (asteroidIndexInRing / totalInThisRing) * Math.PI * 2;
+            }
             
             const x = Math.cos(initialAngle) * distance;
             const z = Math.sin(initialAngle) * distance;
             const y = (Math.random() - 0.5) * 1;
 
-            // ENHANCED COLOR - brighter
+            // ENHANCED COLOR CODING based on type
             let color = 0xdddddd;
             let emissive = 0x111111;
 
@@ -690,25 +1743,22 @@ export default function App(): React.JSX.Element {
                 emissive = 0x111111;
             }
 
-            // Create asteroid mesh - FIXED type casting by casting to unknown first
+            // Create asteroid mesh
             const asteroidMesh = createDetailedAsteroid(size, color);
             asteroidMesh.userData = asteroid;
             const typedMesh = asteroidMesh as unknown as AsteroidMesh;
             
             typedMesh.position.set(x, y, z);
-            typedMesh.orbitRing = orbitRing;
+            typedMesh.orbitRing = ringIndex;
             typedMesh.orbitRadius = distance;
             typedMesh.orbitSpeed = asteroid.relative_velocity_km_s * 0.0001;
             typedMesh.orbitAngle = initialAngle;
             typedMesh.orbitCenter = new THREE.Vector3(0, y, 0);
-            
-            // Store original properties
             typedMesh.originalScale = size;
             typedMesh.originalColor = color;
             typedMesh.originalEmissive = emissive;
             typedMesh.originalEmissiveIntensity = 0.5;
 
-            // Apply emissive to material
             const material = typedMesh.material as THREE.MeshPhongMaterial;
             material.emissive = new THREE.Color(emissive);
             material.emissiveIntensity = 0.5;
@@ -716,14 +1766,61 @@ export default function App(): React.JSX.Element {
             scene.add(typedMesh);
             asteroidMeshes.current[asteroid.id] = typedMesh;
         });
+
+        // CREATE VISUAL RINGS
+        if (showOrbits) {
+            // Remove old rings
+            const oldRings = scene.children.filter(child => child.userData?.isOrbitRing);
+            oldRings.forEach(ring => scene.remove(ring));
+
+            // Create new dynamic rings
+            rings.forEach((ring, ringIndex) => {
+                const orbitGeometry = new THREE.RingGeometry(ring.distance - 0.5, ring.distance + 0.5, 64);
+                const orbitMaterial = new THREE.MeshBasicMaterial({
+                    color: ring.color,
+                    transparent: true,
+                    opacity: ring.opacity,
+                    side: THREE.DoubleSide,
+                });
+                const orbitRing = new THREE.Mesh(orbitGeometry, orbitMaterial);
+                orbitRing.rotation.x = Math.PI / 2;
+                orbitRing.userData = { 
+                    isOrbitRing: true,
+                    ringType: ring.type,
+                    ringIndex: ringIndex
+                };
+                scene.add(orbitRing);
+            });
+        }
+        
+        console.log(`🛰️ Created ${rings.length} dynamic rings:`, 
+            `Critical: ${rings.filter(r => r.type === 'critical').length}, `,
+            `Hazardous: ${rings.filter(r => r.type === 'hazardous').length}, `,
+            `Regular: ${rings.filter(r => r.type === 'regular').length}`
+        );
     };
 
-    // Effect to recreate asteroids when maxAsteroids changes
     useEffect(() => {
         if (isInitialized.current) {
             recreateAsteroids();
         }
     }, [maxAsteroids, visibleAsteroids]);
+
+    // Handle orbit visibility toggle
+    useEffect(() => {
+        if (isInitialized.current && sceneRef.current) {
+            const scene = sceneRef.current;
+            
+            // Remove all orbit rings
+            const oldRings = scene.children.filter(child => child.userData?.isOrbitRing);
+            oldRings.forEach(ring => scene.remove(ring));
+            
+            if (showOrbits) {
+                // Recreate with current dynamic distances
+                recreateAsteroids();
+            }
+        }
+    }, [showOrbits]);
 
     useEffect(() => {
         if (!mountRef.current || isInitialized.current) return;
@@ -740,42 +1837,31 @@ export default function App(): React.JSX.Element {
         );
         cameraRef.current = camera;
 
-        // FIXED renderer setup
-        const renderer = new THREE.WebGLRenderer({
-            antialias: true,
-        });
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.outputColorSpace = THREE.SRGBColorSpace;
         rendererRef.current = renderer;
         renderer.setClearColor(0x000011);
         renderer.setSize(mountRef.current.clientWidth, mountRef.current.clientHeight);
         mountRef.current.appendChild(renderer.domElement);
 
-        // Add star field
         const starField = createStarField();
         scene.add(starField);
 
-        // Enhanced lighting for Earth visibility
         const ambientLight = new THREE.AmbientLight(0x404040, 1.2);
         scene.add(ambientLight);
-
-        // Add hemisphere light for more natural lighting
         const hemisphereLight = new THREE.HemisphereLight(0x87ceeb, 0x362d1e, 0.6);
         scene.add(hemisphereLight);
-
         const sunLight = new THREE.DirectionalLight(0xffffff, 1.2);
         sunLight.position.set(15, 0, 10);
         scene.add(sunLight);
 
-        // Add Earth
         const earth = createDetailedEarth();
         scene.add(earth);
         earthRef.current = earth;
 
-        // Set initial camera position ONCE - ZOOM WORKING PERFECTLY, DON'T TOUCH
         camera.position.set(35, 35 * 0.4, 35);
         camera.lookAt(0, 0, 0);
 
-        // ORBIT CONTROLS - ZOOM WORKING PERFECTLY, DON'T TOUCH
         const controls = new OrbitControls(camera, renderer.domElement);
         controls.target.set(0, 0, 0);
         controls.enableDamping = false;
@@ -783,34 +1869,14 @@ export default function App(): React.JSX.Element {
         controls.enableRotate = true;
         controls.enablePan = true;
         controls.minDistance = 8;
-        controls.maxDistance = 150;
+        controls.maxDistance = 200; // INCREASED maximum zoom distance
         controls.maxPolarAngle = Math.PI;
         controls.autoRotate = false;
         controlsRef.current = controls;
 
-        // Create 3 orbital rings
-        const orbitDistances = [15, 25, 40];
-        const orbitColors = [0x888888, 0x666666, 0x444444];
-        
-        if (showOrbits) {
-            orbitDistances.forEach((distance, ringIndex) => {
-                const orbitGeometry = new THREE.RingGeometry(distance - 0.5, distance + 0.5, 64);
-                const orbitMaterial = new THREE.MeshBasicMaterial({
-                    color: orbitColors[ringIndex],
-                    transparent: true,
-                    opacity: 0.15,
-                    side: THREE.DoubleSide,
-                });
-                const orbitRing = new THREE.Mesh(orbitGeometry, orbitMaterial);
-                orbitRing.rotation.x = Math.PI / 2;
-                scene.add(orbitRing);
-            });
-        }
-
-        // Create initial asteroids
+        // Initial orbit rings will be created by recreateAsteroids() function
         recreateAsteroids();
 
-        // Mouse interaction - FIXED drag vs click detection
         const raycaster = new THREE.Raycaster();
         const mouse = new THREE.Vector2();
         let previousHovered: AsteroidMesh | null = null;
@@ -827,13 +1893,12 @@ export default function App(): React.JSX.Element {
         const onMouseMove = (event: MouseEvent): void => {
             if (!mountRef.current) return;
 
-            // Check if we're dragging (mouse moved significantly since mousedown)
             if (mouseDownTime > 0) {
                 const dragDistance = Math.sqrt(
                     Math.pow(event.clientX - mouseDownPosition.x, 2) + 
                     Math.pow(event.clientY - mouseDownPosition.y, 2)
                 );
-                if (dragDistance > 5) { // 5px threshold
+                if (dragDistance > 5) {
                     isDragging = true;
                 }
             }
@@ -845,7 +1910,6 @@ export default function App(): React.JSX.Element {
             raycaster.setFromCamera(mouse, camera);
             const intersects = raycaster.intersectObjects(Object.values(asteroidMeshes.current));
 
-            // Reset previous hover
             if (previousHovered) {
                 const material = previousHovered.material as THREE.MeshPhongMaterial;
                 material.emissive.setHex(previousHovered.originalEmissive!);
@@ -856,14 +1920,11 @@ export default function App(): React.JSX.Element {
                 setHoveredAsteroid(null);
             }
 
-            // Apply hover effect
             if (intersects.length > 0) {
                 const hoveredMesh = intersects[0].object as AsteroidMesh;
                 const material = hoveredMesh.material as THREE.MeshPhongMaterial;
-                
                 material.emissiveIntensity = 2.0;
                 hoveredMesh.scale.setScalar(1.3);
-                
                 document.body.style.cursor = 'pointer';
                 previousHovered = hoveredMesh;
                 setHoveredAsteroid(hoveredMesh.userData);
@@ -872,11 +1933,9 @@ export default function App(): React.JSX.Element {
 
         const onMouseUp = (event: MouseEvent): void => {
             if (!mountRef.current) return;
-
             const clickDuration = Date.now() - mouseDownTime;
             
-            // Only process clicks (not drags)
-            if (!isDragging && clickDuration < 300) { // Quick click, not drag
+            if (!isDragging && clickDuration < 300) {
                 const rect = mountRef.current.getBoundingClientRect();
                 mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
                 mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
@@ -885,22 +1944,18 @@ export default function App(): React.JSX.Element {
                 const intersects = raycaster.intersectObjects(Object.values(asteroidMeshes.current));
 
                 if (intersects.length > 0) {
-                    // ASTEROID CLICKED - SELECT AND PAUSE ANIMATIONS
                     const clickedMesh = intersects[0].object as AsteroidMesh;
                     setSelectedAsteroid(clickedMesh.userData);
                     
-                    // Remove previous trajectory
                     if (currentImpactTrajectory.current) {
                         scene.remove(currentImpactTrajectory.current);
                         currentImpactTrajectory.current = null;
                     }
                     
-                    // Add impact trajectory from asteroid current position to impact zones
                     const trajectory = createImpactTrajectory(clickedMesh.position, clickedMesh.userData.impact.risk_zones);
                     scene.add(trajectory);
                     currentImpactTrajectory.current = trajectory;
                     
-                    // Click feedback
                     const originalScale = clickedMesh.scale.x;
                     clickedMesh.scale.setScalar(originalScale * 0.9);
                     setTimeout(() => {
@@ -908,33 +1963,22 @@ export default function App(): React.JSX.Element {
                             clickedMesh.scale.setScalar(originalScale);
                         }
                     }, 100);
-                    
-                    console.log('🎯 Asteroid selected - animations paused:', clickedMesh.userData.name);
                 } else {
-                    // CLICKED EMPTY SPACE - DESELECT ASTEROID AND RETURN TO MAIN MENU
                     setSelectedAsteroid(null);
-                    
-                    // Remove trajectory
                     if (currentImpactTrajectory.current) {
                         scene.remove(currentImpactTrajectory.current);
                         currentImpactTrajectory.current = null;
                     }
-                    
-                    console.log('🔄 Asteroid deselected - back to main menu, animations resumed');
                 }
             }
-
-            // Reset tracking variables
             mouseDownTime = 0;
             isDragging = false;
         };
 
-        // Event listeners - UPDATED for drag detection
         mountRef.current.addEventListener('mousedown', onMouseDown);
         mountRef.current.addEventListener('mousemove', onMouseMove);
         mountRef.current.addEventListener('mouseup', onMouseUp);
 
-        // Animation loop - FIXED with proper ref sync via useEffect
         let frameCount = 0;
         const animate = (): void => {
             if (animationIdRef.current) {
@@ -943,10 +1987,8 @@ export default function App(): React.JSX.Element {
             animationIdRef.current = requestAnimationFrame(animate);
             frameCount++;
 
-            // Update OrbitControls
             controls.update();
 
-            // Update distance display very occasionally - ZOOM WORKING PERFECTLY
             if (frameCount % 300 === 0) {
                 const currentDistance = camera.position.distanceTo(controls.target);
                 const roundedDistance = Math.round(currentDistance * 10) / 10;
@@ -955,65 +1997,49 @@ export default function App(): React.JSX.Element {
                 }
             }
 
-            // PAUSE ANIMATIONS WHEN ASTEROID IS SELECTED - FIXED with ref synced by useEffect
             const isAnimationsPaused = selectedAsteroidRef.current !== null;
 
-            // Earth rotation - paused when asteroid selected
             if (!isAnimationsPaused && earthRef.current) {
                 earthRef.current.rotation.y += 0.008 * animationSpeed;
             }
 
-            // Star twinkling (always active)
             const time = Date.now() * 0.001;
 
-            // Asteroid orbital motion and rotation - paused when asteroid selected
+            // FIXED: Ensure all asteroids orbit properly around Earth
             if (!isAnimationsPaused) {
                 Object.values(asteroidMeshes.current).forEach((mesh) => {
                     const asteroid = mesh.userData;
-                    
-                    // Asteroid rotation
                     const rotSpeed = asteroid.relative_velocity_km_s * 0.0001 * animationSpeed;
                     mesh.rotation.x += rotSpeed * 0.5;
                     mesh.rotation.y += rotSpeed;
 
-                    // Orbital motion around Earth
+                    // ENSURE ORBITAL MOTION - All asteroids orbit around Earth at center (0,0,0)
                     if (mesh.orbitRadius && mesh.orbitSpeed !== undefined && mesh.orbitAngle !== undefined && mesh.orbitCenter) {
                         mesh.orbitAngle += mesh.orbitSpeed * animationSpeed;
-                        
-                        // Update position based on orbital motion
+                        // FIXED: All orbits centered on Earth (0,0,0)
                         mesh.position.x = Math.cos(mesh.orbitAngle) * mesh.orbitRadius;
                         mesh.position.z = Math.sin(mesh.orbitAngle) * mesh.orbitRadius;
-                        mesh.position.y = mesh.orbitCenter.y;
+                        mesh.position.y = mesh.orbitCenter.y; // Maintain slight Y variation
                     }
                 });
             }
 
-            // ALWAYS UPDATE GLOW EFFECTS and handle SELECTED ASTEROID PULSE
             Object.values(asteroidMeshes.current).forEach((mesh) => {
                 const asteroid = mesh.userData;
                 const material = mesh.material as THREE.MeshPhongMaterial;
-
-                // Check if this is the selected asteroid
                 const isSelected = selectedAsteroidRef.current && asteroid.id === selectedAsteroidRef.current.id;
 
                 if (isSelected) {
-                    // VERY SLIGHT pulse for selected asteroid
-                    const pulseIntensity = 1.0 + Math.sin(time * 3) * 0.05; // Very subtle 5% scale variation
+                    const pulseIntensity = 1.0 + Math.sin(time * 3) * 0.05;
                     mesh.scale.setScalar(pulseIntensity);
-                    
-                    // Brighter emissive for selected
                     material.emissiveIntensity = 1.5 + Math.sin(time * 2) * 0.3;
                 } else if ((asteroid.is_sentry_object || asteroid.is_potentially_hazardous_asteroid) && mesh !== previousHovered) {
-                    // Natural glow for hazardous asteroids (not selected)
                     const glowIntensity = 0.5 + Math.sin(time * 1.5) * 0.3;
                     material.emissiveIntensity = glowIntensity;
-                    
-                    // Reset scale for non-selected asteroids
                     if (mesh.scale.x !== 1) {
                         mesh.scale.setScalar(1);
                     }
                 } else {
-                    // Reset scale and emissive for regular asteroids
                     if (mesh.scale.x !== 1) {
                         mesh.scale.setScalar(1);
                     }
@@ -1023,10 +2049,9 @@ export default function App(): React.JSX.Element {
                 }
             });
 
-            // Animate impact trajectory if visible (always animate for visual appeal)
             if (currentImpactTrajectory.current) {
                 currentImpactTrajectory.current.children.forEach((child, childIndex) => {
-                    if (child.type === 'Mesh' && childIndex % 3 === 2) { // Pulse rings
+                    if (child.type === 'Mesh' && childIndex % 3 === 2) {
                         const scale = 1 + Math.sin(time * 3 + childIndex) * 0.3;
                         child.scale.setScalar(scale);
                         const material = (child as THREE.Mesh).material as THREE.MeshBasicMaterial;
@@ -1039,38 +2064,31 @@ export default function App(): React.JSX.Element {
         };
         animate();
 
-        // Cleanup - UPDATED for all mouse events
         return () => {
             if (animationIdRef.current) {
                 cancelAnimationFrame(animationIdRef.current);
                 animationIdRef.current = null;
             }
-
             controls.dispose();
-
             if (mountRef.current && renderer.domElement.parentNode) {
                 mountRef.current.removeChild(renderer.domElement);
             }
-
             mountRef.current?.removeEventListener('mousedown', onMouseDown);
             mountRef.current?.removeEventListener('mousemove', onMouseMove);
             mountRef.current?.removeEventListener('mouseup', onMouseUp);
-
             if (currentImpactTrajectory.current) {
                 scene.remove(currentImpactTrajectory.current);
             }
-
             Object.values(asteroidMeshes.current).forEach((mesh) => {
                 mesh.geometry.dispose();
                 if (mesh.material instanceof THREE.Material) {
                     mesh.material.dispose();
                 }
             });
-
             renderer.dispose();
             isInitialized.current = false;
         };
-    }, []); // EMPTY DEPENDENCY ARRAY - ZOOM WORKING PERFECTLY
+    }, []);
 
     const getRiskLevel = (asteroid: AsteroidData): string => {
         if (asteroid.is_sentry_object) return 'CRITICAL';
@@ -1081,14 +2099,10 @@ export default function App(): React.JSX.Element {
 
     const getRiskColor = (level: string): string => {
         switch (level) {
-            case 'CRITICAL':
-                return 'text-red-500 bg-red-100';
-            case 'HIGH':
-                return 'text-orange-500 bg-orange-100';
-            case 'MODERATE':
-                return 'text-yellow-500 bg-yellow-100';
-            default:
-                return 'text-green-500 bg-green-100';
+            case 'CRITICAL': return 'text-red-100 bg-red-900';
+            case 'HIGH': return 'text-orange-100 bg-orange-900';
+            case 'MODERATE': return 'text-yellow-100 bg-yellow-900';
+            default: return 'text-emerald-100 bg-emerald-900';
         }
     };
 
@@ -1097,32 +2111,29 @@ export default function App(): React.JSX.Element {
     };
 
     return (
-        <div className="flex h-screen bg-gray-900 text-white">
-            {/* 3D Visualization */}
+        <div className="flex h-screen" style={{ backgroundColor: '#051622', color: '#deb992' }}>
             <div className="flex-1 relative">
                 <div ref={mountRef} className="w-full h-full" />
-
-                {/* Controls */}
-                <div className="absolute top-4 left-4 bg-gray-800 bg-opacity-90 backdrop-blur-sm rounded-lg p-4 space-y-4">
-                    <h3 className="font-bold text-lg">🌍 Asteroid Tracking System</h3>
-
-                    <div className="space-y-3">
-                        <label className="flex items-center space-x-2">
+                
+                {/* Simplified Controls */}
+                <div className="absolute top-6 left-6 backdrop-blur-lg rounded-2xl p-6" style={{ backgroundColor: 'rgba(27, 160, 152, 0.1)', border: '1px solid rgba(222, 185, 146, 0.2)' }}>
+                    <h3 className="text-2xl font-light tracking-wide mb-6" style={{ color: '#1ba098' }}>Asteroid Monitor</h3>
+                    
+                    <div className="space-y-4">
+                        <label className="flex items-center space-x-3 cursor-pointer">
                             <input
                                 type="checkbox"
                                 checked={showOrbits}
                                 onChange={(e) => setShowOrbits(e.target.checked)}
-                                className="form-checkbox rounded"
+                                className="w-5 h-5 rounded"
+                                style={{ accentColor: '#1ba098' }}
                             />
-                            <span>Show Orbit Paths (3 rings)</span>
+                            <span className="text-sm font-medium">Orbital Paths</span>
                         </label>
 
-                        <div>
-                            <label className="block text-sm mb-1">
-                                Asteroids Shown: {maxAsteroids} / {ASTEROID_DATA.length}
-                                <span className="text-xs text-gray-400 block">
-                                    Slide to control how many asteroids are displayed
-                                </span>
+                        <div className="space-y-2">
+                            <label className="block text-sm font-medium">
+                                Objects: {maxAsteroids} / {ASTEROID_DATA.length}
                             </label>
                             <input
                                 type="range"
@@ -1131,280 +2142,220 @@ export default function App(): React.JSX.Element {
                                 step="1"
                                 value={maxAsteroids}
                                 onChange={(e) => setMaxAsteroids(Number.parseInt(e.target.value))}
-                                className="w-full"
+                                className="w-full h-2 rounded-lg appearance-none cursor-pointer"
+                                style={{ 
+                                    background: 'rgba(222, 185, 146, 0.2)',
+                                    accentColor: '#1ba098'
+                                }}
                             />
-                            <div className="flex justify-between text-xs text-gray-400 mt-1">
-                                <span>1 Most Critical</span>
-                                <span>All {ASTEROID_DATA.length} Objects</span>
-                            </div>
                         </div>
 
-                        <div className="text-xs text-gray-400 pt-2 border-t border-gray-600">
-                            📏 Distance: {cameraDistance.toFixed(1)} units<br/>
-                            🖱️ Left drag: Rotate • Right drag: Pan<br/>
-                            🎮 Mouse wheel: Zoom (8-150 units)<br/>
-                            {selectedAsteroid ? '⏸️ ANIMATIONS PAUSED' : '▶️ Animations active'}
+                        <div className="text-xs opacity-70 pt-3 border-t" style={{ borderColor: 'rgba(222, 185, 146, 0.2)' }}>
+                            Distance: {cameraDistance.toFixed(1)} units
                         </div>
                     </div>
                 </div>
 
-                {/* Enhanced Legend */}
-                <div className="absolute top-4 right-4 bg-gray-800 bg-opacity-90 backdrop-blur-sm rounded-lg p-4">
-                    <h4 className="font-bold mb-2">Legend</h4>
-                    <div className="space-y-1 text-sm">
-                        <div className="flex items-center space-x-2">
+                {/* Simplified Legend */}
+                <div className="absolute top-6 right-6 backdrop-blur-lg rounded-2xl p-6" style={{ backgroundColor: 'rgba(27, 160, 152, 0.1)', border: '1px solid rgba(222, 185, 146, 0.2)' }}>
+                    <h4 className="text-lg font-light mb-4" style={{ color: '#1ba098' }}>Legend</h4>
+                    <div className="space-y-3 text-sm">
+                        <div className="flex items-center space-x-3">
                             <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                            <span>Earth (drag to orbit around)</span>
+                            <span>Earth</span>
                         </div>
-                        <div className="flex items-center space-x-2">
-                            <div className="w-3 h-3 bg-red-500 rounded-full shadow-lg"></div>
-                            <span>Sentry Object (Inner ring)</span>
+                        <div className="flex items-center space-x-3">
+                            <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                            <span>Critical Risk</span>
                         </div>
-                        <div className="flex items-center space-x-2">
+                        <div className="flex items-center space-x-3">
                             <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
-                            <span>Hazardous (Middle ring)</span>
+                            <span>High Risk</span>
                         </div>
-                        <div className="flex items-center space-x-2">
+                        <div className="flex items-center space-x-3">
                             <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-                            <span>Large Asteroid (&gt;10km)</span>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                            <div className="w-3 h-3 bg-gray-300 rounded-full"></div>
-                            <span>Regular (Outer ring)</span>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                            <div className="w-3 h-3 bg-red-600 rounded-full animate-pulse"></div>
-                            <span>Impact Trajectory & Zones</span>
+                            <span>Large Objects</span>
                         </div>
                         
                         {hoveredAsteroid && (
-                            <div className="mt-2 pt-2 border-t border-gray-600">
-                                <div className="text-xs font-bold text-yellow-400">
-                                    HOVERING: {hoveredAsteroid.name}
+                            <div className="mt-4 pt-4 border-t" style={{ borderColor: 'rgba(222, 185, 146, 0.2)' }}>
+                                <div className="text-sm font-semibold" style={{ color: '#1ba098' }}>
+                                    {hoveredAsteroid.name}
                                 </div>
-                                <div className="text-xs text-gray-300">
-                                    Ring: {asteroidMeshes.current[hoveredAsteroid.id]?.orbitRing! + 1}/3
+                                <div className="text-xs opacity-70">
+                                    Ring {asteroidMeshes.current[hoveredAsteroid.id]?.orbitRing! + 1}
                                 </div>
                             </div>
                         )}
                     </div>
                 </div>
-
-                {/* Instructions */}
-                <div className="absolute bottom-4 left-4 bg-gray-800 bg-opacity-90 backdrop-blur-sm rounded-lg p-3">
-                    <p className="text-sm text-gray-300">🖱️ Click (not drag) asteroids to analyze • Click empty space to return to main menu</p>
-                    <p className="text-xs text-gray-400">⚡ Dragging won't deselect • Hover for glow • Selection pauses all motion & adds pulse</p>
-                </div>
             </div>
 
-            {/* Enhanced Sidebar */}
-            <div className="w-96 bg-gray-800 bg-opacity-95 backdrop-blur-sm p-6 overflow-y-auto">
-                <h2 className="text-2xl font-bold mb-4">🚀 Mission Control</h2>
+            {/* Compact Sidebar - NO SCROLLING */}
+            <div className="w-80 h-screen backdrop-blur-xl p-6 flex flex-col" style={{ backgroundColor: 'rgba(5, 22, 34, 0.95)', borderLeft: '1px solid rgba(222, 185, 146, 0.2)' }}>
+                <h2 className="text-3xl font-light tracking-wide mb-6" style={{ color: '#1ba098' }}>Analysis</h2>
 
                 {selectedAsteroid ? (
-                    <div className="space-y-4">
-                        <div className="bg-gray-700 bg-opacity-80 rounded-lg p-4">
-                            <h3 className="font-bold text-lg mb-2">{selectedAsteroid.name}</h3>
-                            <div className="flex items-center space-x-2 mb-2">
-                                <div
-                                    className={`inline-block px-2 py-1 rounded text-xs font-bold ${getRiskColor(getRiskLevel(selectedAsteroid))}`}
-                                >
-                                    {getRiskLevel(selectedAsteroid)} RISK
-                                </div>
-                                <div className="inline-block px-2 py-1 rounded text-xs font-bold bg-blue-100 text-blue-800">
-                                    Torino: {selectedAsteroid.torino_scale}
-                                </div>
-                                <div className="inline-block px-2 py-1 rounded text-xs font-bold bg-purple-100 text-purple-800">
-                                    Ring: {asteroidMeshes.current[selectedAsteroid.id]?.orbitRing! + 1}/3
-                                </div>
-                            </div>
-                            <div className="mb-2">
-                                <span className="text-xs text-red-400">⏸️ ANIMATIONS PAUSED - Click empty space to return to main menu</span>
+                    /* SELECTED ASTEROID VIEW - COMPACT, NO SCROLL */
+                    <div className="space-y-4 flex-1 flex flex-col">
+                        {/* Header */}
+                        <div className="p-4 rounded-2xl flex-shrink-0" style={{ backgroundColor: 'rgba(27, 160, 152, 0.1)', border: '1px solid rgba(222, 185, 146, 0.2)' }}>
+                            <h3 className="text-lg font-medium mb-2" style={{ color: '#deb992' }}>{selectedAsteroid.name}</h3>
+                            <div className="flex flex-wrap gap-2 mb-2">
+                                <span className={`px-2 py-1 rounded-full text-xs font-medium ${getRiskColor(getRiskLevel(selectedAsteroid))}`}>
+                                    {getRiskLevel(selectedAsteroid)}
+                                </span>
+                                <span className="px-2 py-1 rounded-full text-xs font-medium" style={{ backgroundColor: 'rgba(27, 160, 152, 0.2)', color: '#1ba098' }}>
+                                    Torino {selectedAsteroid.torino_scale}
+                                </span>
                             </div>
                             <a
                                 href={selectedAsteroid.nasa_jpl_url}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="block mt-2 text-blue-400 hover:text-blue-300 text-xs underline"
+                                className="text-xs underline opacity-70 hover:opacity-100 transition-opacity"
+                                style={{ color: '#1ba098' }}
                             >
-                                View on NASA JPL →
+                                NASA JPL Data
                             </a>
                         </div>
 
-                        <div className="bg-gray-700 bg-opacity-80 rounded-lg p-4 space-y-3">
-                            <h4 className="font-bold">📊 Physical Properties</h4>
-                            <div className="grid grid-cols-2 gap-2 text-sm">
+                        {/* Properties */}
+                        <div className="p-4 rounded-2xl flex-shrink-0" style={{ backgroundColor: 'rgba(27, 160, 152, 0.1)', border: '1px solid rgba(222, 185, 146, 0.2)' }}>
+                            <h4 className="font-medium mb-3" style={{ color: '#1ba098' }}>Properties</h4>
+                            <div className="grid grid-cols-2 gap-3 text-sm">
                                 <div>
-                                    <span className="text-gray-400">Diameter (km):</span>
-                                    <p className="font-mono">
-                                        {formatNumber(selectedAsteroid.estimated_diameter_km_max)}
+                                    <span className="opacity-70 text-xs">Diameter</span>
+                                    <p className="font-mono" style={{ color: '#deb992' }}>
+                                        {formatNumber(selectedAsteroid.estimated_diameter_km_max)} km
                                     </p>
                                 </div>
                                 <div>
-                                    <span className="text-gray-400">Scene Size:</span>
-                                    <p className="font-mono text-green-400">
-                                        0.8+ units
-                                    </p>
-                                </div>
-                                <div>
-                                    <span className="text-gray-400">Velocity:</span>
-                                    <p className="font-mono">
+                                    <span className="opacity-70 text-xs">Velocity</span>
+                                    <p className="font-mono" style={{ color: '#deb992' }}>
                                         {formatNumber(selectedAsteroid.relative_velocity_km_s)} km/s
                                     </p>
                                 </div>
                                 <div>
-                                    <span className="text-gray-400">Distance (AU):</span>
-                                    <p className="font-mono">
-                                        {formatNumber(selectedAsteroid.miss_distance_au)}
+                                    <span className="opacity-70 text-xs">Distance</span>
+                                    <p className="font-mono" style={{ color: '#deb992' }}>
+                                        {formatNumber(selectedAsteroid.miss_distance_au)} AU
+                                    </p>
+                                </div>
+                                <div>
+                                    <span className="opacity-70 text-xs">Impact Energy</span>
+                                    <p className="font-mono text-red-400">
+                                        {formatNumber(selectedAsteroid.impact.energy_megatons)} Mt
                                     </p>
                                 </div>
                             </div>
                         </div>
 
-                        <div className="bg-gray-700 bg-opacity-80 rounded-lg p-4 space-y-3">
-                            <h4 className="font-bold">🎯 Impact Trajectory & Analysis</h4>
-                            <div className="space-y-2 text-sm">
-                                <div>
-                                    <span className="text-gray-400">Animation State:</span>
-                                    <p className="font-mono text-red-400">
-                                        PAUSED - Earth & asteroids frozen for analysis
-                                    </p>
-                                </div>
-                                <div>
-                                    <span className="text-gray-400">Selected Asteroid:</span>
-                                    <p className="font-mono text-yellow-400">
-                                        Subtle pulse + brighter glow
-                                    </p>
-                                </div>
-                                <div>
-                                    <span className="text-gray-400">Potential Energy:</span>
-                                    <p className="font-mono text-red-400">
-                                        {formatNumber(selectedAsteroid.impact.energy_megatons)} Megatons TNT
-                                    </p>
-                                </div>
-                                <div>
-                                    <span className="text-gray-400">Impact Zones (red markers):</span>
-                                    <div className="mt-1">
-                                        {selectedAsteroid.impact.risk_zones.map((zone, index) => (
-                                            <span
-                                                key={index}
-                                                className="inline-block bg-red-900 bg-opacity-80 text-red-200 px-2 py-1 rounded text-xs mr-1 mb-1"
-                                            >
-                                                🎯 {zone}
-                                            </span>
-                                        ))}
+                        {/* Risk Zones */}
+                        <div className="p-4 rounded-2xl flex-shrink-0" style={{ backgroundColor: 'rgba(27, 160, 152, 0.1)', border: '1px solid rgba(222, 185, 146, 0.2)' }}>
+                            <h4 className="font-medium mb-3" style={{ color: '#1ba098' }}>Risk Zones</h4>
+                            <div className="flex flex-wrap gap-2">
+                                {selectedAsteroid.impact.risk_zones.map((zone, index) => (
+                                    <span
+                                        key={index}
+                                        className="px-2 py-1 rounded-full text-xs font-medium bg-red-900 text-red-100"
+                                    >
+                                        {zone}
+                                    </span>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Generate Report Button */}
+                        <div className="p-4 rounded-2xl flex-shrink-0" style={{ backgroundColor: 'rgba(27, 160, 152, 0.1)', border: '1px solid rgba(222, 185, 146, 0.2)' }}>
+                            <button
+                                onClick={generateSingleAsteroidReport}
+                                disabled={isGeneratingReport}
+                                className={`w-full p-3 rounded-xl font-medium transition-all ${
+                                    isGeneratingReport
+                                        ? 'opacity-50 cursor-not-allowed'
+                                        : 'hover:scale-105'
+                                }`}
+                                style={{ 
+                                    background: 'linear-gradient(135deg, #1ba098, #0d7377)',
+                                    color: '#051622'
+                                }}
+                            >
+                                {isGeneratingReport ? (
+                                    <div className="flex items-center justify-center space-x-3">
+                                        <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+                                        <span>Analyzing...</span>
                                     </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="bg-gray-700 bg-opacity-80 rounded-lg p-4">
-                            <h4 className="font-bold mb-2">🛡️ Mitigation Strategies</h4>
-                            <div className="space-y-2">
-                                <button
-                                    onClick={() =>
-                                        alert(
-                                            `For ${selectedAsteroid.name}: Kinetic Impactor mission would redirect using spacecraft impact`
-                                        )
-                                    }
-                                    className="w-full bg-blue-600 bg-opacity-80 hover:bg-blue-700 px-4 py-2 rounded text-sm transition-colors"
-                                >
-                                    Kinetic Impactor Mission
-                                </button>
-                                <button
-                                    onClick={() =>
-                                        alert(
-                                            `For ${selectedAsteroid.name}: Gravity Tractor would use gravitational pull to slowly alter orbit`
-                                        )
-                                    }
-                                    className="w-full bg-purple-600 bg-opacity-80 hover:bg-purple-700 px-4 py-2 rounded text-sm transition-colors"
-                                >
-                                    Gravity Tractor
-                                </button>
-                                <button
-                                    onClick={() =>
-                                        alert(
-                                            `For ${selectedAsteroid.name}: Nuclear deflection would use controlled explosion to change trajectory`
-                                        )
-                                    }
-                                    className="w-full bg-green-600 bg-opacity-80 hover:bg-green-700 px-4 py-2 rounded text-sm transition-colors"
-                                >
-                                    Nuclear Deflection
-                                </button>
-                            </div>
+                                ) : (
+                                    'Generate Report'
+                                )}
+                            </button>
                         </div>
                     </div>
                 ) : (
-                    // MAIN MENU - This is what shows when no asteroid is selected
-                    <div className="space-y-4">
-                        <p className="text-gray-400">
-                            🖱️ Drag to look around • Click asteroids to analyze • Use slider above to control how many asteroids are shown
-                        </p>
+                    /* MAIN MENU VIEW */
+                    <div className="space-y-6 flex-1">
+                        {/* AI Analysis */}
+                        <div className="p-5 rounded-2xl" style={{ backgroundColor: 'rgba(27, 160, 152, 0.1)', border: '1px solid rgba(222, 185, 146, 0.2)' }}>
+                            <h4 className="font-medium mb-4" style={{ color: '#1ba098' }}>AI Analysis</h4>
+                            <div className="space-y-3 mb-4 text-sm">
+                                <div className="flex justify-between">
+                                    <span className="opacity-70">Objects</span>
+                                    <span style={{ color: '#1ba098' }}>{maxAsteroids}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="opacity-70">Type</span>
+                                    <span style={{ color: '#1ba098' }}>Comprehensive</span>
+                                </div>
+                            </div>
+                            <button
+                                onClick={generateAIReport}
+                                disabled={isGeneratingReport}
+                                className={`w-full p-4 rounded-xl font-medium transition-all ${
+                                    isGeneratingReport
+                                        ? 'opacity-50 cursor-not-allowed'
+                                        : 'hover:scale-105'
+                                }`}
+                                style={{ 
+                                    background: 'linear-gradient(135deg, #1ba098, #0d7377)',
+                                    color: '#051622'
+                                }}
+                            >
+                                {isGeneratingReport ? (
+                                    <div className="flex items-center justify-center space-x-3">
+                                        <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+                                        <span>Analyzing...</span>
+                                    </div>
+                                ) : (
+                                    'Generate Report'
+                                )}
+                            </button>
+                        </div>
 
-                        <div className="bg-gray-700 bg-opacity-80 rounded-lg p-4">
-                            <h4 className="font-bold mb-2">🎮 Controls</h4>
-                            <div className="space-y-2 text-sm">
+                        {/* Ring System */}
+                        <div className="p-5 rounded-2xl" style={{ backgroundColor: 'rgba(27, 160, 152, 0.1)', border: '1px solid rgba(222, 185, 146, 0.2)' }}>
+                            <h4 className="font-medium mb-4" style={{ color: '#1ba098' }}>Dynamic Rings</h4>
+                            <div className="space-y-3 text-sm">
                                 <div className="flex justify-between">
-                                    <span>Select Asteroid:</span>
-                                    <span className="font-mono text-green-400">Click (not drag)</span>
+                                    <span>Max per Ring</span>
+                                    <span style={{ color: '#1ba098' }}>5 Objects</span>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span>Return to Menu:</span>
-                                    <span className="font-mono text-blue-400">Click Empty Space</span>
+                                    <span>Ring Spacing</span>
+                                    <span style={{ color: '#1ba098' }}>12 Units</span>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span>Pause Animations:</span>
-                                    <span className="font-mono text-red-400">Auto on Select</span>
-                                </div>
-                                <div className="flex justify-between">
-                                    <span>Selected Visual:</span>
-                                    <span className="font-mono text-yellow-400">Subtle Pulse</span>
+                                    <span>Auto-Creation</span>
+                                    <span className="text-green-400">Enabled</span>
                                 </div>
                             </div>
                         </div>
 
-                        <div className="bg-gray-700 bg-opacity-80 rounded-lg p-4">
-                            <h4 className="font-bold mb-2">📊 Current Status</h4>
-                            <div className="space-y-2 text-sm">
-                                <div className="flex justify-between">
-                                    <span>Asteroids Displayed:</span>
-                                    <span className="font-mono text-green-400">{maxAsteroids} / {ASTEROID_DATA.length}</span>
-                                </div>
-                                <div className="flex justify-between">
-                                    <span>Animations:</span>
-                                    <span className="font-mono text-green-400">▶️ ACTIVE</span>
-                                </div>
-                                <div className="flex justify-between">
-                                    <span>Earth Rotation:</span>
-                                    <span className="font-mono text-green-400">▶️ ACTIVE</span>
-                                </div>
-                                <div className="flex justify-between">
-                                    <span>Asteroid Orbits:</span>
-                                    <span className="font-mono text-green-400">▶️ ACTIVE</span>
-                                </div>
-                                <div className="flex justify-between">
-                                    <span>Camera Zoom:</span>
-                                    <span className="font-mono text-green-400">✅ STABLE</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="bg-gray-700 bg-opacity-80 rounded-lg p-4">
-                            <h4 className="font-bold mb-2">🛸 Orbital Ring System</h4>
-                            <div className="space-y-2 text-sm">
-                                <div className="flex justify-between">
-                                    <span>Ring 1 (Inner):</span>
-                                    <span className="font-mono text-red-400">Critical/Sentry</span>
-                                </div>
-                                <div className="flex justify-between">
-                                    <span>Ring 2 (Middle):</span>
-                                    <span className="font-mono text-orange-400">Hazardous</span>
-                                </div>
-                                <div className="flex justify-between">
-                                    <span>Ring 3 (Outer):</span>
-                                    <span className="font-mono text-gray-400">Regular</span>
-                                </div>
-                            </div>
+                        {/* Instructions */}
+                        <div className="p-5 rounded-2xl" style={{ backgroundColor: 'rgba(27, 160, 152, 0.1)', border: '1px solid rgba(222, 185, 146, 0.2)' }}>
+                            <p className="text-sm opacity-70">
+                                Click asteroids to analyze • Drag to navigate • Scroll to zoom
+                            </p>
                         </div>
                     </div>
                 )}
