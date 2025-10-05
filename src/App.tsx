@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 // ========== API CONFIGURATION ==========
-const API_BASE_URL = 'http://localhost:5000'; // Change this to your API URL
+const API_BASE_URL = 'http://localhost:8010'; // Change this to your API URL
 // =======================================
 
 interface AsteroidData {
@@ -1323,83 +1323,55 @@ export default function App(): JSX.Element {
                         border: '1px solid rgba(222, 185, 146, 0.2)',
                     }}
                 >
-                    <button
-                        type="button"
-                        onClick={() => togglePanel('asteroidMonitor')}
-                        className="w-full text-left px-4 py-2 focus:outline-none flex justify-between items-center"
+                    <h3
+                        className="text-2xl font-light tracking-wide mb-6"
+                        style={{ color: '#1ba098' }}
                     >
-                        <h3
-                            className="text-2xl font-light tracking-wide mb-6"
-                            style={{ color: '#1ba098' }}
-                        >
-                            Asteroid Monitor
-                        </h3>
-                        <span>{expandedPanels.asteroidMonitor ? '▲' : '▼'}</span>
-                    </button>
-                    {expandedPanels.asteroidMonitor && (
-                        <div className="px-4 py-2 space-y-2">
-                            <div className="space-y-4">
-                                <label className="flex items-center space-x-3 cursor-pointer">
-                                    <input
-                                        type="checkbox"
-                                        checked={showOrbits}
-                                        onChange={(e) => setShowOrbits(e.target.checked)}
-                                        className="w-5 h-5 rounded"
-                                        style={{ accentColor: '#1ba098' }}
-                                    />
-                                    <span className="text-sm font-medium">Orbital Paths</span>
+                        Asteroid Monitor
+                    </h3>
+
+                    <div className="px-4 py-2 space-y-2">
+                        <div className="space-y-4">
+                            <label className="flex items-center space-x-3 cursor-pointer">
+                                <input
+                                    type="checkbox"
+                                    checked={showOrbits}
+                                    onChange={(e) => setShowOrbits(e.target.checked)}
+                                    className="w-5 h-5 rounded"
+                                    style={{ accentColor: '#1ba098' }}
+                                />
+                                <span className="text-sm font-medium">Orbital Paths</span>
+                            </label>
+
+                            <div className="space-y-2">
+                                <label className="block text-sm font-medium">
+                                    Objects: {maxAsteroids} / {asteroidData.length}
                                 </label>
+                                <input
+                                    type="range"
+                                    min="1"
+                                    max={asteroidData.length}
+                                    step="1"
+                                    value={maxAsteroids}
+                                    onChange={(e) =>
+                                        setMaxAsteroids(Number.parseInt(e.target.value))
+                                    }
+                                    className="w-full h-2 rounded-lg appearance-none cursor-pointer"
+                                    style={{
+                                        background: 'rgba(222, 185, 146, 0.2)',
+                                        accentColor: '#1ba098',
+                                    }}
+                                />
+                            </div>
 
-                                <div className="space-y-2">
-                                    <label className="block text-sm font-medium">
-                                        Objects: {maxAsteroids} / {ASTEROID_DATA.length}
-                                    </label>
-                                    <input
-                                        type="range"
-                                        min="1"
-                                        max={ASTEROID_DATA.length}
-                                        step="1"
-                                        value={maxAsteroids}
-                                        onChange={(e) =>
-                                            setMaxAsteroids(Number.parseInt(e.target.value))
-                                        }
-                                        className="w-full h-2 rounded-lg appearance-none cursor-pointer"
-                                        style={{
-                                            background: 'rgba(222, 185, 146, 0.2)',
-                                            accentColor: '#1ba098',
-                                        }}
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="block text-sm font-medium">
-                                        Objects: {maxAsteroids} / {asteroidData.length}
-                                    </label>
-                                    <input
-                                        type="range"
-                                        min="1"
-                                        max={asteroidData.length}
-                                        step="1"
-                                        value={maxAsteroids}
-                                        onChange={(e) =>
-                                            setMaxAsteroids(Number.parseInt(e.target.value))
-                                        }
-                                        className="w-full h-2 rounded-lg appearance-none cursor-pointer"
-                                        style={{
-                                            background: 'rgba(222, 185, 146, 0.2)',
-                                            accentColor: '#1ba098',
-                                        }}
-                                    />
-                                </div>
-
-                                <div
-                                    className="text-xs opacity-70 pt-3 border-t"
-                                    style={{ borderColor: 'rgba(222, 185, 146, 0.2)' }}
-                                >
-                                    Distance: {cameraDistance.toFixed(1)} units
-                                </div>
+                            <div
+                                className="text-xs opacity-70 pt-3 border-t"
+                                style={{ borderColor: 'rgba(222, 185, 146, 0.2)' }}
+                            >
+                                Distance: {cameraDistance.toFixed(1)} units
                             </div>
                         </div>
-                    )}
+                    </div>
                 </div>
 
                 {/* Simplified Legend */}
@@ -1419,49 +1391,46 @@ export default function App(): JSX.Element {
                         <h4 className="text-lg font-light mb-4" style={{ color: '#1ba098' }}>
                             Legend
                         </h4>
-                        <span>{expandedPanels.legend ? '▲' : '▼'}</span>
                     </button>
-                    {expandedPanels.legend && (
-                        <div className="px-4 py-2 space-y-2 text-sm">
-                            <div className="space-y-3 text-sm">
-                                <div className="flex items-center space-x-3">
-                                    <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                                    <span>Earth</span>
-                                </div>
-                                <div className="flex items-center space-x-3">
-                                    <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                                    <span>Critical Risk</span>
-                                </div>
-                                <div className="flex items-center space-x-3">
-                                    <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
-                                    <span>High Risk</span>
-                                </div>
-                                <div className="flex items-center space-x-3">
-                                    <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-                                    <span>Large Objects</span>
-                                </div>
 
-                                {hoveredAsteroid && (
-                                    <div
-                                        className="mt-4 pt-4 border-t"
-                                        style={{ borderColor: 'rgba(222, 185, 146, 0.2)' }}
-                                    >
-                                        <div
-                                            className="text-sm font-semibold"
-                                            style={{ color: '#1ba098' }}
-                                        >
-                                            {hoveredAsteroid.name}
-                                        </div>
-                                        <div className="text-xs opacity-70">
-                                            Ring{' '}
-                                            {asteroidMeshes.current[hoveredAsteroid.id]
-                                                ?.orbitRing! + 1}
-                                        </div>
-                                    </div>
-                                )}
+                    <div className="px-4 py-2 space-y-2 text-sm">
+                        <div className="space-y-3 text-sm">
+                            <div className="flex items-center space-x-3">
+                                <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                                <span>Earth</span>
                             </div>
+                            <div className="flex items-center space-x-3">
+                                <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                                <span>Critical Risk</span>
+                            </div>
+                            <div className="flex items-center space-x-3">
+                                <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
+                                <span>High Risk</span>
+                            </div>
+                            <div className="flex items-center space-x-3">
+                                <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                                <span>Large Objects</span>
+                            </div>
+
+                            {hoveredAsteroid && (
+                                <div
+                                    className="mt-4 pt-4 border-t"
+                                    style={{ borderColor: 'rgba(222, 185, 146, 0.2)' }}
+                                >
+                                    <div
+                                        className="text-sm font-semibold"
+                                        style={{ color: '#1ba098' }}
+                                    >
+                                        {hoveredAsteroid.name}
+                                    </div>
+                                    <div className="text-xs opacity-70">
+                                        Ring{' '}
+                                        {asteroidMeshes.current[hoveredAsteroid.id]?.orbitRing! + 1}
+                                    </div>
+                                </div>
+                            )}
                         </div>
-                    )}
+                    </div>
                 </div>
             </div>
 
@@ -1483,12 +1452,12 @@ export default function App(): JSX.Element {
                     className="w-full text-left px-4 py-2 focus:outline-none flex justify-between items-center"
                 >
                     <h2
-                        className="text-3xl font-light tracking-wide mb-6"
+                        className="text-3xl font-light tracking-wide mb-6 flex items-center gap-2"
                         style={{ color: '#1ba098' }}
                     >
-                        Analysis
+                        <span>{expandedPanels.analysis ? '❯' : '❮'}</span>
+                        <span className="">Analysis</span>
                     </h2>
-                    <span>{expandedPanels.analysis ? '◀' : '▶'}</span>
                 </button>
                 {expandedPanels.analysis && (
                     <div className="px-4 py-2 space-y-2 text-sm">
