@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 // ========== API CONFIGURATION ==========
-const API_BASE_URL = 'http://localhost:8010'; // Change this to your API URL
+const API_BASE_URL = 'http://localhost:5000'; // Change this to your API URL
 // =======================================
 
 interface AsteroidData {
@@ -482,12 +482,8 @@ export default function App(): JSX.Element {
     const [loadError, setLoadError] = useState<string | null>(null);
 
     const [expandedPanels, setExpandedPanels] = useState<{
-        asteroidMonitor: boolean;
-        legend: boolean;
         analysis: boolean;
     }>({
-        asteroidMonitor: true,
-        legend: true,
         analysis: true,
     });
 
@@ -1383,15 +1379,9 @@ export default function App(): JSX.Element {
                         border: '1px solid rgba(222, 185, 146, 0.2)',
                     }}
                 >
-                    <button
-                        type="button"
-                        onClick={() => togglePanel('legend')}
-                        className="w-full text-left px-4 py-2 focus:outline-none flex justify-between items-center"
-                    >
-                        <h4 className="text-lg font-light mb-4" style={{ color: '#1ba098' }}>
-                            Legend
-                        </h4>
-                    </button>
+                    <h4 className="text-lg font-light mb-4" style={{ color: '#1ba098' }}>
+                        Legend
+                    </h4>
 
                     <div className="px-4 py-2 space-y-2 text-sm">
                         <div className="space-y-3 text-sm">
@@ -1437,10 +1427,10 @@ export default function App(): JSX.Element {
             {/* Compact Sidebar - NO SCROLLING */}
             <div
                 className={`
-      h-screen flex flex-col transition-all duration-500 ease-in-out
-      absolute right-0 top-0 overflow-hidden
-      ${expandedPanels.analysis ? 'w-80' : 'w-12'}
-    `}
+                h-screen flex flex-col transition-all duration-500 ease-in-out
+                absolute right-0 top-0 overflow-hidden
+                ${expandedPanels.analysis ? 'w-80' : 'w-12'}
+                `}
                 style={{
                     backgroundColor: 'rgba(5, 22, 34, 0.95)',
                     borderLeft: '1px solid rgba(222, 185, 146, 0.2)',
@@ -1452,7 +1442,7 @@ export default function App(): JSX.Element {
                     className="w-full text-left px-4 py-2 focus:outline-none flex justify-between items-center"
                 >
                     <h2
-                        className="text-3xl font-light tracking-wide mb-6 flex items-center gap-2"
+                        className="text-3xl font-light tracking-wide mb-6 flex items-center gap-4"
                         style={{ color: '#1ba098' }}
                     >
                         <span>{expandedPanels.analysis ? '❯' : '❮'}</span>
