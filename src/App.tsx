@@ -481,16 +481,6 @@ export default function App(): JSX.Element {
     const [isLoadingAsteroids, setIsLoadingAsteroids] = useState<boolean>(true);
     const [loadError, setLoadError] = useState<string | null>(null);
 
-    const [expandedPanels, setExpandedPanels] = useState<{
-        asteroidMonitor: boolean;
-        legend: boolean;
-        analysis: boolean;
-    }>({
-        asteroidMonitor: true,
-        legend: true,
-        analysis: true,
-    });
-
     const asteroidMeshes = useRef<Record<string, AsteroidMesh>>({});
     const currentImpactTrajectory = useRef<THREE.Group | null>(null);
     const sceneRef = useRef<THREE.Scene | null>(null);
@@ -660,13 +650,6 @@ export default function App(): JSX.Element {
         }
     };
 
-    const togglePanel = (panel: keyof typeof expandedPanels) => {
-        setExpandedPanels((prev) => ({
-            ...prev,
-            [panel]: !prev[panel],
-        }));
-    };
-
     // DYNAMIC RING CREATION SYSTEM - Creates as many rings as needed
     const recreateAsteroids = () => {
         if (!sceneRef.current || visibleAsteroids.length === 0) return;
@@ -682,11 +665,10 @@ export default function App(): JSX.Element {
         asteroidMeshes.current = {};
 
         const calculateDynamicRings = () => {
-            const maxAsteroidsPerRing = 5; // Max asteroids per ring before creating new ring
-            const baseDistance = 15; // Starting distance for first ring
-            const ringGap = 12; // INCREASED gap between rings for better spacing
+            const maxAsteroidsPerRing = 5;
+            const baseDistance = 15;
+            const ringGap = 12;
 
-            // Categorize asteroids by priority
             const criticalAsteroids = visibleAsteroids.filter(
                 (a) => a.is_sentry_object || a.torino_scale >= 3,
             );
@@ -699,7 +681,6 @@ export default function App(): JSX.Element {
                 (a) => !criticalAsteroids.includes(a) && !hazardousAsteroids.includes(a),
             );
 
-            // Calculate how many rings we need for each category
             const criticalRings = Math.max(
                 1,
                 Math.ceil(criticalAsteroids.length / maxAsteroidsPerRing),
@@ -713,11 +694,9 @@ export default function App(): JSX.Element {
                 Math.ceil(regularAsteroids.length / maxAsteroidsPerRing),
             );
 
-            // Create ring configuration
             const rings = [];
             let currentDistance = baseDistance;
 
-            // Critical rings (innermost)
             for (let i = 0; i < criticalRings; i++) {
                 rings.push({
                     distance: currentDistance,
@@ -728,7 +707,6 @@ export default function App(): JSX.Element {
                 currentDistance += ringGap;
             }
 
-            // Hazardous rings (middle)
             for (let i = 0; i < hazardousRings; i++) {
                 rings.push({
                     distance: currentDistance,
@@ -739,7 +717,6 @@ export default function App(): JSX.Element {
                 currentDistance += ringGap;
             }
 
-            // Regular rings (outermost)
             for (let i = 0; i < regularRings; i++) {
                 rings.push({
                     distance: currentDistance,
@@ -767,7 +744,6 @@ export default function App(): JSX.Element {
             maxAsteroidsPerRing,
         } = calculateDynamicRings();
 
-        // Distribute asteroids across rings
         const hazardousRingIndex =
             criticalAsteroids.length > 0
                 ? Math.ceil(criticalAsteroids.length / maxAsteroidsPerRing)
@@ -781,7 +757,6 @@ export default function App(): JSX.Element {
         visibleAsteroids.forEach((asteroid, index) => {
             let ringIndex, ringType, asteroidList, localIndex;
 
-            // Determine which ring this asteroid belongs to
             if (criticalAsteroids.includes(asteroid)) {
                 ringIndex = Math.floor(criticalAsteroids.indexOf(asteroid) / maxAsteroidsPerRing);
                 ringType = 'critical';
@@ -804,7 +779,7 @@ export default function App(): JSX.Element {
             }
 
             const ring = rings[ringIndex];
-            if (!ring) return; // Safety check
+            if (!ring) return;
 
             let distance = ring.distance;
             distance += (Math.random() - 0.5) * 3;
@@ -822,7 +797,6 @@ export default function App(): JSX.Element {
                 size = Math.max(diameterKm * 1.0, 0.8);
             }
 
-            // OPTIMAL POSITIONING within ring - max 5 per ring
             const asteroidIndexInRing = localIndex % maxAsteroidsPerRing;
             const totalInThisRing = Math.min(
                 maxAsteroidsPerRing,
@@ -882,7 +856,6 @@ export default function App(): JSX.Element {
         });
 
         if (showOrbits) {
-            // Remove old rings
             const oldRings = scene.children.filter((child) => child.userData?.isOrbitRing);
             oldRings.forEach((ring) => scene.remove(ring));
 
@@ -927,7 +900,6 @@ export default function App(): JSX.Element {
         if (isInitialized.current && sceneRef.current && !isLoadingAsteroids) {
             const scene = sceneRef.current;
 
-            // Remove all orbit rings
             const oldRings = scene.children.filter((child) => child.userData?.isOrbitRing);
             oldRings.forEach((ring) => scene.remove(ring));
 
@@ -1131,7 +1103,6 @@ export default function App(): JSX.Element {
                     mesh.rotation.x += rotSpeed * 0.5;
                     mesh.rotation.y += rotSpeed;
 
-                    // ENSURE ORBITAL MOTION - All asteroids orbit around Earth at center (0,0,0)
                     if (
                         mesh.orbitRadius &&
                         mesh.orbitSpeed !== undefined &&
@@ -1315,7 +1286,7 @@ export default function App(): JSX.Element {
             <div className="flex-1 relative">
                 <div ref={mountRef} className="w-full h-full" />
 
-                {/* Simplified Controls */}
+                {/* FIXED: Simplified Controls - NO collapsible panels */}
                 <div
                     className="absolute top-6 left-6 backdrop-blur-lg rounded-2xl p-6"
                     style={{
@@ -1323,416 +1294,326 @@ export default function App(): JSX.Element {
                         border: '1px solid rgba(222, 185, 146, 0.2)',
                     }}
                 >
-                    <button
-                        type="button"
-                        onClick={() => togglePanel('asteroidMonitor')}
-                        className="w-full text-left px-4 py-2 focus:outline-none flex justify-between items-center"
+                    <h3
+                        className="text-2xl font-light tracking-wide mb-6"
+                        style={{ color: '#1ba098' }}
                     >
-                        <h3
-                            className="text-2xl font-light tracking-wide mb-6"
-                            style={{ color: '#1ba098' }}
-                        >
-                            Asteroid Monitor
-                        </h3>
-                        <span>{expandedPanels.asteroidMonitor ? '▲' : '▼'}</span>
-                    </button>
-                    {expandedPanels.asteroidMonitor && (
-                        <div className="px-4 py-2 space-y-2">
-                            <div className="space-y-4">
-                                <label className="flex items-center space-x-3 cursor-pointer">
-                                    <input
-                                        type="checkbox"
-                                        checked={showOrbits}
-                                        onChange={(e) => setShowOrbits(e.target.checked)}
-                                        className="w-5 h-5 rounded"
-                                        style={{ accentColor: '#1ba098' }}
-                                    />
-                                    <span className="text-sm font-medium">Orbital Paths</span>
-                                </label>
+                        Asteroid Monitor
+                    </h3>
 
-                                <div className="space-y-2">
-                                    <label className="block text-sm font-medium">
-                                        Objects: {maxAsteroids} / {ASTEROID_DATA.length}
-                                    </label>
-                                    <input
-                                        type="range"
-                                        min="1"
-                                        max={ASTEROID_DATA.length}
-                                        step="1"
-                                        value={maxAsteroids}
-                                        onChange={(e) =>
-                                            setMaxAsteroids(Number.parseInt(e.target.value))
-                                        }
-                                        className="w-full h-2 rounded-lg appearance-none cursor-pointer"
-                                        style={{
-                                            background: 'rgba(222, 185, 146, 0.2)',
-                                            accentColor: '#1ba098',
-                                        }}
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="block text-sm font-medium">
-                                        Objects: {maxAsteroids} / {asteroidData.length}
-                                    </label>
-                                    <input
-                                        type="range"
-                                        min="1"
-                                        max={asteroidData.length}
-                                        step="1"
-                                        value={maxAsteroids}
-                                        onChange={(e) =>
-                                            setMaxAsteroids(Number.parseInt(e.target.value))
-                                        }
-                                        className="w-full h-2 rounded-lg appearance-none cursor-pointer"
-                                        style={{
-                                            background: 'rgba(222, 185, 146, 0.2)',
-                                            accentColor: '#1ba098',
-                                        }}
-                                    />
-                                </div>
+                    <div className="space-y-4">
+                        <label className="flex items-center space-x-3 cursor-pointer">
+                            <input
+                                type="checkbox"
+                                checked={showOrbits}
+                                onChange={(e) => setShowOrbits(e.target.checked)}
+                                className="w-5 h-5 rounded"
+                                style={{ accentColor: '#1ba098' }}
+                            />
+                            <span className="text-sm font-medium">Orbital Paths</span>
+                        </label>
 
-                                <div
-                                    className="text-xs opacity-70 pt-3 border-t"
-                                    style={{ borderColor: 'rgba(222, 185, 146, 0.2)' }}
-                                >
-                                    Distance: {cameraDistance.toFixed(1)} units
-                                </div>
-                            </div>
+                        <div className="space-y-2">
+                            <label className="block text-sm font-medium">
+                                Objects: {maxAsteroids} / {asteroidData.length}
+                            </label>
+                            <input
+                                type="range"
+                                min="1"
+                                max={asteroidData.length}
+                                step="1"
+                                value={maxAsteroids}
+                                onChange={(e) => setMaxAsteroids(Number.parseInt(e.target.value))}
+                                className="w-full h-2 rounded-lg appearance-none cursor-pointer"
+                                style={{
+                                    background: 'rgba(222, 185, 146, 0.2)',
+                                    accentColor: '#1ba098',
+                                }}
+                            />
                         </div>
-                    )}
+
+                        <div
+                            className="text-xs opacity-70 pt-3 border-t"
+                            style={{ borderColor: 'rgba(222, 185, 146, 0.2)' }}
+                        >
+                            Distance: {cameraDistance.toFixed(1)} units
+                        </div>
+                    </div>
                 </div>
 
-                {/* Simplified Legend */}
+                {/* FIXED: Simplified Legend - NO collapsible panels */}
                 <div
-                    className="absolute top-6 backdrop-blur-lg rounded-2xl p-6 transition-all duration-500"
+                    className="absolute top-6 right-6 backdrop-blur-lg rounded-2xl p-6"
                     style={{
-                        right: expandedPanels.analysis ? '21rem' : '5rem', // shifts left when sidebar open
                         backgroundColor: 'rgba(27, 160, 152, 0.1)',
                         border: '1px solid rgba(222, 185, 146, 0.2)',
                     }}
                 >
-                    <button
-                        type="button"
-                        onClick={() => togglePanel('legend')}
-                        className="w-full text-left px-4 py-2 focus:outline-none flex justify-between items-center"
-                    >
-                        <h4 className="text-lg font-light mb-4" style={{ color: '#1ba098' }}>
-                            Legend
-                        </h4>
-                        <span>{expandedPanels.legend ? '▲' : '▼'}</span>
-                    </button>
-                    {expandedPanels.legend && (
-                        <div className="px-4 py-2 space-y-2 text-sm">
-                            <div className="space-y-3 text-sm">
-                                <div className="flex items-center space-x-3">
-                                    <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                                    <span>Earth</span>
-                                </div>
-                                <div className="flex items-center space-x-3">
-                                    <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                                    <span>Critical Risk</span>
-                                </div>
-                                <div className="flex items-center space-x-3">
-                                    <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
-                                    <span>High Risk</span>
-                                </div>
-                                <div className="flex items-center space-x-3">
-                                    <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-                                    <span>Large Objects</span>
-                                </div>
-
-                                {hoveredAsteroid && (
-                                    <div
-                                        className="mt-4 pt-4 border-t"
-                                        style={{ borderColor: 'rgba(222, 185, 146, 0.2)' }}
-                                    >
-                                        <div
-                                            className="text-sm font-semibold"
-                                            style={{ color: '#1ba098' }}
-                                        >
-                                            {hoveredAsteroid.name}
-                                        </div>
-                                        <div className="text-xs opacity-70">
-                                            Ring{' '}
-                                            {asteroidMeshes.current[hoveredAsteroid.id]
-                                                ?.orbitRing! + 1}
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
+                    <h4 className="text-lg font-light mb-4" style={{ color: '#1ba098' }}>
+                        Legend
+                    </h4>
+                    <div className="space-y-3 text-sm">
+                        <div className="flex items-center space-x-3">
+                            <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                            <span>Earth</span>
                         </div>
-                    )}
+                        <div className="flex items-center space-x-3">
+                            <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                            <span>Critical Risk</span>
+                        </div>
+                        <div className="flex items-center space-x-3">
+                            <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
+                            <span>High Risk</span>
+                        </div>
+                        <div className="flex items-center space-x-3">
+                            <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                            <span>Large Objects</span>
+                        </div>
+
+                        {hoveredAsteroid && (
+                            <div
+                                className="mt-4 pt-4 border-t"
+                                style={{ borderColor: 'rgba(222, 185, 146, 0.2)' }}
+                            >
+                                <div className="text-sm font-semibold" style={{ color: '#1ba098' }}>
+                                    {hoveredAsteroid.name}
+                                </div>
+                                <div className="text-xs opacity-70">
+                                    Ring {asteroidMeshes.current[hoveredAsteroid.id]?.orbitRing! + 1}
+                                </div>
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
 
-            {/* Compact Sidebar - NO SCROLLING */}
+            {/* FIXED: Sidebar without collapsible - ALWAYS VISIBLE */}
             <div
-                className={`
-      h-screen flex flex-col transition-all duration-500 ease-in-out
-      absolute right-0 top-0 overflow-hidden
-      ${expandedPanels.analysis ? 'w-80' : 'w-12'}
-    `}
+                className="w-80 h-screen backdrop-blur-xl p-6 flex flex-col"
                 style={{
                     backgroundColor: 'rgba(5, 22, 34, 0.95)',
                     borderLeft: '1px solid rgba(222, 185, 146, 0.2)',
                 }}
             >
-                <button
-                    type="button"
-                    onClick={() => togglePanel('analysis')}
-                    className="w-full text-left px-4 py-2 focus:outline-none flex justify-between items-center"
-                >
-                    <h2
-                        className="text-3xl font-light tracking-wide mb-6"
-                        style={{ color: '#1ba098' }}
-                    >
-                        Analysis
-                    </h2>
-                    <span>{expandedPanels.analysis ? '◀' : '▶'}</span>
-                </button>
-                {expandedPanels.analysis && (
-                    <div className="px-4 py-2 space-y-2 text-sm">
-                        {selectedAsteroid ? (
-                            /* SELECTED ASTEROID VIEW - COMPACT, NO SCROLL */
-                            <div className="space-y-4 flex-1 flex flex-col">
-                                {/* Header */}
-                                <div
-                                    className="p-4 rounded-2xl flex-shrink-0"
-                                    style={{
-                                        backgroundColor: 'rgba(27, 160, 152, 0.1)',
-                                        border: '1px solid rgba(222, 185, 146, 0.2)',
-                                    }}
-                                >
-                                    <h3
-                                        className="text-lg font-medium mb-2"
-                                        style={{ color: '#deb992' }}
-                                    >
-                                        {selectedAsteroid.name}
-                                    </h3>
-                                    <div className="flex flex-wrap gap-2 mb-2">
-                                        <span
-                                            className={`px-2 py-1 rounded-full text-xs font-medium ${getRiskColor(getRiskLevel(selectedAsteroid))}`}
-                                        >
-                                            {getRiskLevel(selectedAsteroid)}
-                                        </span>
-                                        <span
-                                            className="px-2 py-1 rounded-full text-xs font-medium"
-                                            style={{
-                                                backgroundColor: 'rgba(27, 160, 152, 0.2)',
-                                                color: '#1ba098',
-                                            }}
-                                        >
-                                            Torino {selectedAsteroid.torino_scale}
-                                        </span>
-                                    </div>
-                                    <a
-                                        href={selectedAsteroid.nasa_jpl_url}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="text-xs underline opacity-70 hover:opacity-100 transition-opacity"
-                                        style={{ color: '#1ba098' }}
-                                    >
-                                        NASA JPL Data
-                                    </a>
-                                </div>
+                <h2 className="text-3xl font-light tracking-wide mb-6" style={{ color: '#1ba098' }}>
+                    Analysis
+                </h2>
 
-                                {/* Properties */}
-                                <div
-                                    className="p-4 rounded-2xl flex-shrink-0"
+                {selectedAsteroid ? (
+                    <div className="space-y-4 flex-1 flex flex-col">
+                        <div
+                            className="p-4 rounded-2xl flex-shrink-0"
+                            style={{
+                                backgroundColor: 'rgba(27, 160, 152, 0.1)',
+                                border: '1px solid rgba(222, 185, 146, 0.2)',
+                            }}
+                        >
+                            <h3 className="text-lg font-medium mb-2" style={{ color: '#deb992' }}>
+                                {selectedAsteroid.name}
+                            </h3>
+                            <div className="flex flex-wrap gap-2 mb-2">
+                                <span
+                                    className={`px-2 py-1 rounded-full text-xs font-medium ${getRiskColor(getRiskLevel(selectedAsteroid))}`}
+                                >
+                                    {getRiskLevel(selectedAsteroid)}
+                                </span>
+                                <span
+                                    className="px-2 py-1 rounded-full text-xs font-medium"
                                     style={{
-                                        backgroundColor: 'rgba(27, 160, 152, 0.1)',
-                                        border: '1px solid rgba(222, 185, 146, 0.2)',
+                                        backgroundColor: 'rgba(27, 160, 152, 0.2)',
+                                        color: '#1ba098',
                                     }}
                                 >
-                                    <h4 className="font-medium mb-3" style={{ color: '#1ba098' }}>
-                                        Properties
-                                    </h4>
-                                    <div className="grid grid-cols-2 gap-3 text-sm">
-                                        <div>
-                                            <span className="opacity-70 text-xs">Diameter</span>
-                                            <p className="font-mono" style={{ color: '#deb992' }}>
-                                                {formatNumber(
-                                                    selectedAsteroid.estimated_diameter_km_max,
-                                                )}{' '}
-                                                km
-                                            </p>
-                                        </div>
-                                        <div>
-                                            <span className="opacity-70 text-xs">Velocity</span>
-                                            <p className="font-mono" style={{ color: '#deb992' }}>
-                                                {formatNumber(
-                                                    selectedAsteroid.relative_velocity_km_s,
-                                                )}{' '}
-                                                km/s
-                                            </p>
-                                        </div>
-                                        <div>
-                                            <span className="opacity-70 text-xs">Distance</span>
-                                            <p className="font-mono" style={{ color: '#deb992' }}>
-                                                {formatNumber(selectedAsteroid.miss_distance_au)} AU
-                                            </p>
-                                        </div>
-                                        <div>
-                                            <span className="opacity-70 text-xs">
-                                                Impact Energy
-                                            </span>
-                                            <p className="font-mono text-red-400">
-                                                {formatNumber(
-                                                    selectedAsteroid.impact.energy_megatons,
-                                                )}{' '}
-                                                Mt
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Risk Zones */}
-                                <div
-                                    className="p-4 rounded-2xl flex-shrink-0"
-                                    style={{
-                                        backgroundColor: 'rgba(27, 160, 152, 0.1)',
-                                        border: '1px solid rgba(222, 185, 146, 0.2)',
-                                    }}
-                                >
-                                    <h4 className="font-medium mb-3" style={{ color: '#1ba098' }}>
-                                        Risk Zones
-                                    </h4>
-                                    <div className="flex flex-wrap gap-2">
-                                        {selectedAsteroid.impact.risk_zones.map((zone, index) => (
-                                            <span
-                                                key={index}
-                                                className="px-2 py-1 rounded-full text-xs font-medium bg-red-900 text-red-100"
-                                            >
-                                                {zone}
-                                            </span>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                {/* Generate Report Button */}
-                                <div
-                                    className="p-4 rounded-2xl flex-shrink-0"
-                                    style={{
-                                        backgroundColor: 'rgba(27, 160, 152, 0.1)',
-                                        border: '1px solid rgba(222, 185, 146, 0.2)',
-                                    }}
-                                >
-                                    <button
-                                        type="button"
-                                        onClick={generateSingleAsteroidReport}
-                                        disabled={isGeneratingReport}
-                                        className={`w-full p-3 rounded-xl font-medium transition-all ${
-                                            isGeneratingReport
-                                                ? 'opacity-50 cursor-not-allowed'
-                                                : 'hover:scale-105'
-                                        }`}
-                                        style={{
-                                            background: 'linear-gradient(135deg, #1ba098, #0d7377)',
-                                            color: '#051622',
-                                        }}
-                                    >
-                                        {isGeneratingReport ? (
-                                            <div className="flex items-center justify-center space-x-3">
-                                                <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
-                                                <span>Analyzing...</span>
-                                            </div>
-                                        ) : (
-                                            'Generate Report'
-                                        )}
-                                    </button>
-                                </div>
+                                    Torino {selectedAsteroid.torino_scale}
+                                </span>
                             </div>
-                        ) : (
-                            /* MAIN MENU VIEW */
-                            <div className="space-y-6 flex-1">
-                                {/* AI Analysis */}
-                                <div
-                                    className="p-5 rounded-2xl"
-                                    style={{
-                                        backgroundColor: 'rgba(27, 160, 152, 0.1)',
-                                        border: '1px solid rgba(222, 185, 146, 0.2)',
-                                    }}
-                                >
-                                    <h4 className="font-medium mb-4" style={{ color: '#1ba098' }}>
-                                        AI Analysis
-                                    </h4>
-                                    <div className="space-y-3 mb-4 text-sm">
-                                        <div className="flex justify-between">
-                                            <span className="opacity-70">Objects</span>
-                                            <span style={{ color: '#1ba098' }}>{maxAsteroids}</span>
-                                        </div>
-                                        <div className="flex justify-between">
-                                            <span className="opacity-70">Type</span>
-                                            <span style={{ color: '#1ba098' }}>Comprehensive</span>
-                                        </div>
-                                    </div>
-                                    <button
-                                        type="button"
-                                        onClick={generateAIReport}
-                                        disabled={isGeneratingReport}
-                                        className={`w-full p-4 rounded-xl font-medium transition-all ${
-                                            isGeneratingReport
-                                                ? 'opacity-50 cursor-not-allowed'
-                                                : 'hover:scale-105'
-                                        }`}
-                                        style={{
-                                            background: 'linear-gradient(135deg, #1ba098, #0d7377)',
-                                            color: '#051622',
-                                        }}
-                                    >
-                                        {isGeneratingReport ? (
-                                            <div className="flex items-center justify-center space-x-3">
-                                                <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
-                                                <span>Analyzing...</span>
-                                            </div>
-                                        ) : (
-                                            'Generate Report'
-                                        )}
-                                    </button>
-                                </div>
+                            <a
+                                href={selectedAsteroid.nasa_jpl_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-xs underline opacity-70 hover:opacity-100 transition-opacity"
+                                style={{ color: '#1ba098' }}
+                            >
+                                NASA JPL Data
+                            </a>
+                        </div>
 
-                                {/* Ring System */}
-                                <div
-                                    className="p-5 rounded-2xl"
-                                    style={{
-                                        backgroundColor: 'rgba(27, 160, 152, 0.1)',
-                                        border: '1px solid rgba(222, 185, 146, 0.2)',
-                                    }}
-                                >
-                                    <h4 className="font-medium mb-4" style={{ color: '#1ba098' }}>
-                                        Dynamic Rings
-                                    </h4>
-                                    <div className="space-y-3 text-sm">
-                                        <div className="flex justify-between">
-                                            <span>Max per Ring</span>
-                                            <span style={{ color: '#1ba098' }}>5 Objects</span>
-                                        </div>
-                                        <div className="flex justify-between">
-                                            <span>Ring Spacing</span>
-                                            <span style={{ color: '#1ba098' }}>12 Units</span>
-                                        </div>
-                                        <div className="flex justify-between">
-                                            <span>Auto-Creation</span>
-                                            <span className="text-green-400">Enabled</span>
-                                        </div>
-                                    </div>
+                        <div
+                            className="p-4 rounded-2xl flex-shrink-0"
+                            style={{
+                                backgroundColor: 'rgba(27, 160, 152, 0.1)',
+                                border: '1px solid rgba(222, 185, 146, 0.2)',
+                            }}
+                        >
+                            <h4 className="font-medium mb-3" style={{ color: '#1ba098' }}>
+                                Properties
+                            </h4>
+                            <div className="grid grid-cols-2 gap-3 text-sm">
+                                <div>
+                                    <span className="opacity-70 text-xs">Diameter</span>
+                                    <p className="font-mono" style={{ color: '#deb992' }}>
+                                        {formatNumber(selectedAsteroid.estimated_diameter_km_max)} km
+                                    </p>
                                 </div>
-
-                                {/* Instructions */}
-                                <div
-                                    className="p-5 rounded-2xl"
-                                    style={{
-                                        backgroundColor: 'rgba(27, 160, 152, 0.1)',
-                                        border: '1px solid rgba(222, 185, 146, 0.2)',
-                                    }}
-                                >
-                                    <p className="text-sm opacity-70">
-                                        Click asteroids to analyze • Drag to navigate • Scroll to
-                                        zoom
+                                <div>
+                                    <span className="opacity-70 text-xs">Velocity</span>
+                                    <p className="font-mono" style={{ color: '#deb992' }}>
+                                        {formatNumber(selectedAsteroid.relative_velocity_km_s)} km/s
+                                    </p>
+                                </div>
+                                <div>
+                                    <span className="opacity-70 text-xs">Distance</span>
+                                    <p className="font-mono" style={{ color: '#deb992' }}>
+                                        {formatNumber(selectedAsteroid.miss_distance_au)} AU
+                                    </p>
+                                </div>
+                                <div>
+                                    <span className="opacity-70 text-xs">Impact Energy</span>
+                                    <p className="font-mono text-red-400">
+                                        {formatNumber(selectedAsteroid.impact.energy_megatons)} Mt
                                     </p>
                                 </div>
                             </div>
-                        )}
+                        </div>
+
+                        <div
+                            className="p-4 rounded-2xl flex-shrink-0"
+                            style={{
+                                backgroundColor: 'rgba(27, 160, 152, 0.1)',
+                                border: '1px solid rgba(222, 185, 146, 0.2)',
+                            }}
+                        >
+                            <h4 className="font-medium mb-3" style={{ color: '#1ba098' }}>
+                                Risk Zones
+                            </h4>
+                            <div className="flex flex-wrap gap-2">
+                                {selectedAsteroid.impact.risk_zones.map((zone, index) => (
+                                    <span
+                                        key={index}
+                                        className="px-2 py-1 rounded-full text-xs font-medium bg-red-900 text-red-100"
+                                    >
+                                        {zone}
+                                    </span>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div
+                            className="p-4 rounded-2xl flex-shrink-0"
+                            style={{
+                                backgroundColor: 'rgba(27, 160, 152, 0.1)',
+                                border: '1px solid rgba(222, 185, 146, 0.2)',
+                            }}
+                        >
+                            <button
+                                type="button"
+                                onClick={generateSingleAsteroidReport}
+                                disabled={isGeneratingReport}
+                                className={`w-full p-3 rounded-xl font-medium transition-all ${
+                                    isGeneratingReport
+                                        ? 'opacity-50 cursor-not-allowed'
+                                        : 'hover:scale-105'
+                                }`}
+                                style={{
+                                    background: 'linear-gradient(135deg, #1ba098, #0d7377)',
+                                    color: '#051622',
+                                }}
+                            >
+                                {isGeneratingReport ? (
+                                    <div className="flex items-center justify-center space-x-3">
+                                        <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+                                        <span>Analyzing...</span>
+                                    </div>
+                                ) : (
+                                    'Generate Report'
+                                )}
+                            </button>
+                        </div>
+                    </div>
+                ) : (
+                    <div className="space-y-6 flex-1">
+                        <div
+                            className="p-5 rounded-2xl"
+                            style={{
+                                backgroundColor: 'rgba(27, 160, 152, 0.1)',
+                                border: '1px solid rgba(222, 185, 146, 0.2)',
+                            }}
+                        >
+                            <h4 className="font-medium mb-4" style={{ color: '#1ba098' }}>
+                                AI Analysis
+                            </h4>
+                            <div className="space-y-3 mb-4 text-sm">
+                                <div className="flex justify-between">
+                                    <span className="opacity-70">Objects</span>
+                                    <span style={{ color: '#1ba098' }}>{maxAsteroids}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="opacity-70">Type</span>
+                                    <span style={{ color: '#1ba098' }}>Comprehensive</span>
+                                </div>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={generateAIReport}
+                                disabled={isGeneratingReport}
+                                className={`w-full p-4 rounded-xl font-medium transition-all ${
+                                    isGeneratingReport
+                                        ? 'opacity-50 cursor-not-allowed'
+                                        : 'hover:scale-105'
+                                }`}
+                                style={{
+                                    background: 'linear-gradient(135deg, #1ba098, #0d7377)',
+                                    color: '#051622',
+                                }}
+                            >
+                                {isGeneratingReport ? (
+                                    <div className="flex items-center justify-center space-x-3">
+                                        <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+                                        <span>Analyzing...</span>
+                                    </div>
+                                ) : (
+                                    'Generate Report'
+                                )}
+                            </button>
+                        </div>
+
+                        <div
+                            className="p-5 rounded-2xl"
+                            style={{
+                                backgroundColor: 'rgba(27, 160, 152, 0.1)',
+                                border: '1px solid rgba(222, 185, 146, 0.2)',
+                            }}
+                        >
+                            <h4 className="font-medium mb-4" style={{ color: '#1ba098' }}>
+                                Dynamic Rings
+                            </h4>
+                            <div className="space-y-3 text-sm">
+                                <div className="flex justify-between">
+                                    <span>Max per Ring</span>
+                                    <span style={{ color: '#1ba098' }}>5 Objects</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span>Ring Spacing</span>
+                                    <span style={{ color: '#1ba098' }}>12 Units</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span>Auto-Creation</span>
+                                    <span className="text-green-400">Enabled</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div
+                            className="p-5 rounded-2xl"
+                            style={{
+                                backgroundColor: 'rgba(27, 160, 152, 0.1)',
+                                border: '1px solid rgba(222, 185, 146, 0.2)',
+                            }}
+                        >
+                            <p className="text-sm opacity-70">
+                                Click asteroids to analyze • Drag to navigate • Scroll to zoom
+                            </p>
+                        </div>
                     </div>
                 )}
             </div>
