@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 // ========== API CONFIGURATION ==========
-const API_BASE_URL = 'http://localhost:5000'; // Change this to your API URL
+const API_BASE_URL = 'http://127.0.0.1:8010'; // Change this to your API URL
 // =======================================
 
 interface AsteroidData {
@@ -60,12 +60,9 @@ function calculateImpactEnergy(diameterKm: number, velocityKmS: number): number 
     const radiusM = (diameterKm * 1000) / 2;
     const volumeM3 = (4 / 3) * Math.PI * radiusM ** 3;
     const massKg = volumeM3 * density;
-
     const velocityMS = velocityKmS * 1000;
     const energyJoules = 0.5 * massKg * velocityMS ** 2;
-
     const megatonsTNT = energyJoules / 4.184e15;
-
     return megatonsTNT;
 }
 
@@ -83,13 +80,11 @@ function calculateTorinoScale(
         if (diameterKm > 1) return 4;
         return 3;
     }
-
     if (isPHA) {
         if (energyMegatons > 100000) return 3;
         if (diameterKm > 1) return 2;
         return 1;
     }
-
     return 0;
 }
 
@@ -100,7 +95,6 @@ function calculateCraterSize(diameterKm: number, velocityKmS: number): number {
 
 function generateRiskZones(energyMegatons: number, isPHA: boolean, isSentry: boolean): string[] {
     const zones: string[] = [];
-
     if (energyMegatons > 100000) {
         zones.push('Global Extinction Event', 'Mass Extinction Event', 'Global Devastation');
     } else if (energyMegatons > 10000) {
@@ -114,7 +108,6 @@ function generateRiskZones(energyMegatons: number, isPHA: boolean, isSentry: boo
     } else {
         zones.push('Remote Ocean');
     }
-
     return zones;
 }
 
@@ -126,21 +119,16 @@ function calculateImportanceScore(
     isSentry: boolean,
 ): number {
     let score = 0;
-
     if (diameterKm > 10) score += 4;
     else if (diameterKm > 1) score += 3;
     else if (diameterKm > 0.5) score += 2;
     else score += 1;
-
     if (velocityKmS > 25) score += 2;
     else if (velocityKmS > 15) score += 1;
-
     if (missDistanceAU < 0.05) score += 2;
     else if (missDistanceAU < 0.2) score += 1;
-
     if (isSentry) score += 3;
     else if (isPHA) score += 2;
-
     return Math.min(score, 10);
 }
 
@@ -498,6 +486,13 @@ export default function App(): JSX.Element {
     const isInitialized = useRef<boolean>(false);
     const selectedAsteroidRef = useRef<AsteroidData | null>(null);
 
+    const togglePanel = (panel: keyof typeof expandedPanels) => {
+        setExpandedPanels((prev) => ({
+            ...prev,
+            [panel]: !prev[panel],
+        }));
+    };
+
     useEffect(() => {
         selectedAsteroidRef.current = selectedAsteroid;
     }, [selectedAsteroid]);
@@ -569,7 +564,6 @@ export default function App(): JSX.Element {
             } catch (error) {
                 console.error('Failed to fetch asteroid data:', error);
                 setLoadError(error instanceof Error ? error.message : 'Unknown error occurred');
-
                 setAsteroidData([]);
                 setMaxAsteroids(0);
             } finally {
@@ -585,6 +579,7 @@ export default function App(): JSX.Element {
         return asteroidData.slice(0, maxAsteroids);
     }, [maxAsteroids, asteroidData]);
 
+    // Multi-asteroid report - Opens HTML in new tab
     const generateAIReport = async () => {
         setIsGeneratingReport(true);
         try {
@@ -596,17 +591,24 @@ export default function App(): JSX.Element {
                 },
                 body: JSON.stringify({
                     asteroidIds,
-                    requestedAt: new Date().toISOString(),
-                    totalAsteroids: asteroidIds.length,
                 }),
             });
 
             if (response.ok) {
-                const result = await response.json();
-                console.log('AI Report generated:', result);
-                alert(
-                    `✅ AI Report generated successfully! Report ID: ${result.reportId || 'Generated'}`,
-                );
+                // Get HTML content from backend
+                const htmlContent = await response.text();
+
+                // Open new tab and write HTML content
+                const newTab = window.open('', '_blank');
+                if (newTab) {
+                    newTab.document.write(htmlContent);
+                    newTab.document.close();
+                    console.log(
+                        `✅ AI Report opened in new tab for ${asteroidIds.length} asteroids`,
+                    );
+                } else {
+                    alert('❌ Please allow pop-ups to view the report');
+                }
             } else {
                 console.error('Failed to generate report:', response.statusText);
                 alert('❌ Failed to generate AI report. Please try again.');
@@ -619,6 +621,7 @@ export default function App(): JSX.Element {
         }
     };
 
+    // Single asteroid report - Opens HTML in new tab
     const generateSingleAsteroidReport = async () => {
         if (!selectedAsteroid) return;
 
@@ -631,17 +634,22 @@ export default function App(): JSX.Element {
                 },
                 body: JSON.stringify({
                     asteroidIds: [selectedAsteroid.id],
-                    requestedAt: new Date().toISOString(),
-                    totalAsteroids: 1,
                 }),
             });
 
             if (response.ok) {
-                const result = await response.json();
-                console.log('Single Asteroid Report generated:', result);
-                alert(
-                    `✅ Report for ${selectedAsteroid.name} generated successfully! Report ID: ${result.reportId || 'Generated'}`,
-                );
+                // Get HTML content from backend
+                const htmlContent = await response.text();
+
+                // Open new tab and write HTML content
+                const newTab = window.open('', '_blank');
+                if (newTab) {
+                    newTab.document.write(htmlContent);
+                    newTab.document.close();
+                    console.log(`✅ Report for ${selectedAsteroid.name} opened in new tab`);
+                } else {
+                    alert('❌ Please allow pop-ups to view the report');
+                }
             } else {
                 console.error('Failed to generate single asteroid report:', response.statusText);
                 alert('❌ Failed to generate asteroid report. Please try again.');
@@ -656,14 +664,6 @@ export default function App(): JSX.Element {
         }
     };
 
-    const togglePanel = (panel: keyof typeof expandedPanels) => {
-        setExpandedPanels((prev) => ({
-            ...prev,
-            [panel]: !prev[panel],
-        }));
-    };
-
-    // DYNAMIC RING CREATION SYSTEM - Creates as many rings as needed
     const recreateAsteroids = () => {
         if (!sceneRef.current || visibleAsteroids.length === 0) return;
         const scene = sceneRef.current;
@@ -678,11 +678,10 @@ export default function App(): JSX.Element {
         asteroidMeshes.current = {};
 
         const calculateDynamicRings = () => {
-            const maxAsteroidsPerRing = 5; // Max asteroids per ring before creating new ring
-            const baseDistance = 15; // Starting distance for first ring
-            const ringGap = 12; // INCREASED gap between rings for better spacing
+            const maxAsteroidsPerRing = 5;
+            const baseDistance = 15;
+            const ringGap = 12;
 
-            // Categorize asteroids by priority
             const criticalAsteroids = visibleAsteroids.filter(
                 (a) => a.is_sentry_object || a.torino_scale >= 3,
             );
@@ -695,7 +694,6 @@ export default function App(): JSX.Element {
                 (a) => !criticalAsteroids.includes(a) && !hazardousAsteroids.includes(a),
             );
 
-            // Calculate how many rings we need for each category
             const criticalRings = Math.max(
                 1,
                 Math.ceil(criticalAsteroids.length / maxAsteroidsPerRing),
@@ -709,11 +707,9 @@ export default function App(): JSX.Element {
                 Math.ceil(regularAsteroids.length / maxAsteroidsPerRing),
             );
 
-            // Create ring configuration
             const rings = [];
             let currentDistance = baseDistance;
 
-            // Critical rings (innermost)
             for (let i = 0; i < criticalRings; i++) {
                 rings.push({
                     distance: currentDistance,
@@ -724,7 +720,6 @@ export default function App(): JSX.Element {
                 currentDistance += ringGap;
             }
 
-            // Hazardous rings (middle)
             for (let i = 0; i < hazardousRings; i++) {
                 rings.push({
                     distance: currentDistance,
@@ -735,7 +730,6 @@ export default function App(): JSX.Element {
                 currentDistance += ringGap;
             }
 
-            // Regular rings (outermost)
             for (let i = 0; i < regularRings; i++) {
                 rings.push({
                     distance: currentDistance,
@@ -763,7 +757,6 @@ export default function App(): JSX.Element {
             maxAsteroidsPerRing,
         } = calculateDynamicRings();
 
-        // Distribute asteroids across rings
         const hazardousRingIndex =
             criticalAsteroids.length > 0
                 ? Math.ceil(criticalAsteroids.length / maxAsteroidsPerRing)
@@ -774,33 +767,29 @@ export default function App(): JSX.Element {
                 ? Math.ceil(hazardousAsteroids.length / maxAsteroidsPerRing)
                 : 0);
 
-        visibleAsteroids.forEach((asteroid, index) => {
-            let ringIndex, ringType, asteroidList, localIndex;
+        visibleAsteroids.forEach((asteroid) => {
+            let ringIndex, asteroidList, localIndex;
 
-            // Determine which ring this asteroid belongs to
             if (criticalAsteroids.includes(asteroid)) {
                 ringIndex = Math.floor(criticalAsteroids.indexOf(asteroid) / maxAsteroidsPerRing);
-                ringType = 'critical';
                 asteroidList = criticalAsteroids;
                 localIndex = criticalAsteroids.indexOf(asteroid);
             } else if (hazardousAsteroids.includes(asteroid)) {
                 ringIndex =
                     hazardousRingIndex +
                     Math.floor(hazardousAsteroids.indexOf(asteroid) / maxAsteroidsPerRing);
-                ringType = 'hazardous';
                 asteroidList = hazardousAsteroids;
                 localIndex = hazardousAsteroids.indexOf(asteroid);
             } else {
                 ringIndex =
                     regularRingIndex +
                     Math.floor(regularAsteroids.indexOf(asteroid) / maxAsteroidsPerRing);
-                ringType = 'regular';
                 asteroidList = regularAsteroids;
                 localIndex = regularAsteroids.indexOf(asteroid);
             }
 
             const ring = rings[ringIndex];
-            if (!ring) return; // Safety check
+            if (!ring) return;
 
             let distance = ring.distance;
             distance += (Math.random() - 0.5) * 3;
@@ -818,7 +807,6 @@ export default function App(): JSX.Element {
                 size = Math.max(diameterKm * 1.0, 0.8);
             }
 
-            // OPTIMAL POSITIONING within ring - max 5 per ring
             const asteroidIndexInRing = localIndex % maxAsteroidsPerRing;
             const totalInThisRing = Math.min(
                 maxAsteroidsPerRing,
@@ -878,7 +866,6 @@ export default function App(): JSX.Element {
         });
 
         if (showOrbits) {
-            // Remove old rings
             const oldRings = scene.children.filter((child) => child.userData?.isOrbitRing);
             oldRings.forEach((ring) => scene.remove(ring));
 
@@ -922,11 +909,8 @@ export default function App(): JSX.Element {
     useEffect(() => {
         if (isInitialized.current && sceneRef.current && !isLoadingAsteroids) {
             const scene = sceneRef.current;
-
-            // Remove all orbit rings
             const oldRings = scene.children.filter((child) => child.userData?.isOrbitRing);
             oldRings.forEach((ring) => scene.remove(ring));
-
             if (showOrbits) {
                 recreateAsteroids();
             }
@@ -1127,7 +1111,6 @@ export default function App(): JSX.Element {
                     mesh.rotation.x += rotSpeed * 0.5;
                     mesh.rotation.y += rotSpeed;
 
-                    // ENSURE ORBITAL MOTION - All asteroids orbit around Earth at center (0,0,0)
                     if (
                         mesh.orbitRadius &&
                         mesh.orbitSpeed !== undefined &&
@@ -1311,7 +1294,6 @@ export default function App(): JSX.Element {
             <div className="flex-1 relative">
                 <div ref={mountRef} className="w-full h-full" />
 
-                {/* Simplified Controls */}
                 <div
                     className="absolute top-6 left-6 backdrop-blur-lg rounded-2xl p-6"
                     style={{
@@ -1370,7 +1352,6 @@ export default function App(): JSX.Element {
                     </div>
                 </div>
 
-                {/* Simplified Legend */}
                 <div
                     className="absolute top-6 backdrop-blur-lg rounded-2xl p-6 transition-all duration-500"
                     style={{
@@ -1424,7 +1405,6 @@ export default function App(): JSX.Element {
                 </div>
             </div>
 
-            {/* Compact Sidebar - NO SCROLLING */}
             <div
                 className={`
                 h-screen flex flex-col transition-all duration-500 ease-in-out
@@ -1495,7 +1475,6 @@ export default function App(): JSX.Element {
                                     </a>
                                 </div>
 
-                                {/* Properties */}
                                 <div
                                     className="p-4 rounded-2xl flex-shrink-0"
                                     style={{
@@ -1545,7 +1524,6 @@ export default function App(): JSX.Element {
                                     </div>
                                 </div>
 
-                                {/* Risk Zones */}
                                 <div
                                     className="p-4 rounded-2xl flex-shrink-0"
                                     style={{
@@ -1568,7 +1546,6 @@ export default function App(): JSX.Element {
                                     </div>
                                 </div>
 
-                                {/* Generate Report Button */}
                                 <div
                                     className="p-4 rounded-2xl flex-shrink-0"
                                     style={{
@@ -1602,9 +1579,7 @@ export default function App(): JSX.Element {
                                 </div>
                             </div>
                         ) : (
-                            /* MAIN MENU VIEW */
                             <div className="space-y-6 flex-1">
-                                {/* AI Analysis */}
                                 <div
                                     className="p-5 rounded-2xl"
                                     style={{
@@ -1650,7 +1625,6 @@ export default function App(): JSX.Element {
                                     </button>
                                 </div>
 
-                                {/* Ring System */}
                                 <div
                                     className="p-5 rounded-2xl"
                                     style={{
@@ -1677,7 +1651,6 @@ export default function App(): JSX.Element {
                                     </div>
                                 </div>
 
-                                {/* Instructions */}
                                 <div
                                     className="p-5 rounded-2xl"
                                     style={{
